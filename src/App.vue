@@ -4,8 +4,19 @@ import Box from 'components/box';
 
 export default {
     components: { Sidebar, Box},
+    beforeMount: function() {
+        console.log('beforMount-app');
+    },
+    mounted: function() {
+        
+        console.log('mounted-app');
+    },
+
     directives: {
         drag: {
+            inserted: function(el) {
+                el.dataset.initLeft = $(el).css("left")/$(el).parent().width();
+            },
             bind: function (el, binding) {
                 var itemA = binding.value.itemA;
                 var itemB = binding.value.itemB;
@@ -16,6 +27,7 @@ export default {
                     helper: false,  //remove jquery auto add relative;
                     axis: "x",
                     start: function (event, ui) {
+                        originalPosition.parentWidth = $(ui).parent().width();
                         originalPosition.start = ui.position.left;
                         originalPosition.widthA = $(itemA).width();
                         originalPosition.widthB = $(itemB).width();
@@ -29,11 +41,9 @@ export default {
                         $(itemB).width(newWidthB);
                     },
                     stop:function(event,ui) {
-                        var parentWidth = $(itemA).parent().width();
-                        
-                        $(el).css("left", (ui.position.left/parentWidth)*100 + "%");
-                        $(itemA).width(($(itemA).width()/parentWidth)*100 + "%");
-                        $(itemB).width(($(itemB).width()/parentWidth)*100 + "%");
+                        $(el).css("left", (ui.position.left/originalPosition.parentWidth)*100 + "%");
+                        $(itemA).width(($(itemA).width()/originalPosition.parentWidth)*100 + "%");
+                        $(itemB).width(($(itemB).width()/originalPosition.parentWidth)*100 + "%");
                     }
                 });
 
@@ -46,9 +56,9 @@ export default {
 <template>
     <div class="sketch">
         <Box class="BoxA"></Box>
-        <Sidebar class="L" v-drag="{ itemA: '.BoxA', itemB: '.BoxB'}"></Sidebar>
+        <Sidebar class="L" v-drag="{ itemA: '.BoxA', itemB: '.BoxB', scale: '0.1'}"></Sidebar>
         <Box class="BoxB"></Box>
-        <Sidebar class="R" v-drag="{ itemA: '.BoxB', itemB: '.BoxC'}"></Sidebar>
+        <Sidebar class="R" v-drag="{ itemA: '.BoxB', itemB: '.BoxC', scale: '0.1'}"></Sidebar>
         <Box class="BoxC"></Box>
     </div>
 </template>

@@ -5,7 +5,8 @@ export default {
 </script>
 
 <template>
-    <div class="test"></div>
+    <div class="test">
+    </div>
 </template>
 
 <style lang="less" scoped>
