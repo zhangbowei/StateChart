@@ -1,13 +1,7 @@
 <script>
 
 export default {
-    beforeMount: function() {
-        console.log('beforMount-sidebar');
-    },
-    mounted: function() {
-        console.log($('boby'));
-        console.log('mounted-sidebar');
-    }
+    
 }
 </script>
 
