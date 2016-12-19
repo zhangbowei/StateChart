@@ -11,30 +11,31 @@ export default {
                 el.dataset.initLRatio = $(el).position().left/$(el).parent().width();
             },
             bind: function (el, binding) {
+                var $el = $(el);
                 var itemA = binding.value.itemA;
                 var itemB = binding.value.itemB;
                 var limit = binding.value.limit;
 
-                $(el).draggable({
+                $el.draggable({
                     helper: false,  //remove jquery auto add relative;
                     axis: "x",
                     start: function (event) {
-                        el.dataset.parentW = $(el).parent().width();
-                        el.dataset.startL = $(el).position().left;
+                        el.dataset.parentW = $el.parent().width();
+                        el.dataset.startL = $el.position().left;
                         el.dataset.widthA = $(itemA).width();
                         el.dataset.widthB = $(itemB).width();
                     },
                     drag: function(event) {
-                        if (Math.abs($(el).position().left/el.dataset.parentW - el.dataset.initLRatio) > limit) {
+                        if (Math.abs($el.position().left/el.dataset.parentW - el.dataset.initLRatio) > limit) {
                             event.preventDefault();
 
-                            var unlawLRatio = $(el).position().left/el.dataset.parentW;
+                            var unlawLRatio = $el.position().left/el.dataset.parentW;
                             var newLRatio = unlawLRatio > el.dataset.initLRatio ? +el.dataset.initLRatio + +limit : +el.dataset.initLRatio - +limit;
                             
-                            $(el).css("left", newLRatio*100 + "%");
+                            $el.css("left", newLRatio*100 + "%");
                         }
 
-                        var d = $(el).position().left - el.dataset.startL;
+                        var d = $el.position().left - el.dataset.startL;
                         var newWidthA = +el.dataset.widthA + d;
                         var newWidthB = +el.dataset.widthB - d;
                         
@@ -42,9 +43,12 @@ export default {
                         $(itemB).width(newWidthB);
                     },
                     stop:function(event) {
-                        $(el).css("left", ($(el).position().left/el.dataset.parentW)*100 + "%");
-                        $(itemA).width(($(itemA).width()/el.dataset.parentW)*100 + "%");
-                        $(itemB).width(($(itemB).width()/el.dataset.parentW)*100 + "%");
+                        var d = $el.position().left - el.dataset.startL;
+                        var newWidthA = +el.dataset.widthA + d;
+                        var newWidthB = +el.dataset.widthB - d;
+                        $el.css("left", ($el.position().left/el.dataset.parentW)*100 + "%");
+                        $(itemA).width((newWidthA/el.dataset.parentW)*100 + "%");
+                        $(itemB).width((newWidthB/el.dataset.parentW)*100 + "%");
                     }
                 });
 
