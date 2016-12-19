@@ -4,11 +4,24 @@ import Box from 'components/box';
 
 export default {
     components: { Sidebar, Box},
+    beforeMount: function() {
+        console.log($('.BoxA'));
+        console.log($('#app'));
+        console.log($('body'));
+    },
+    mounted: function() {
+        console.log($('.BoxA'));
+        console.log($('#app'));
+        console.log($('body'));
+    },
 
     directives: {
         drag: {
             inserted: function(el) {
                 el.dataset.initLRatio = $(el).position().left/$(el).parent().width();
+                console.log($('.BoxA'));
+                console.log($('#app'));
+                console.log($('body'));
             },
             bind: function (el, binding) {
                 var $el = $(el);
@@ -26,7 +39,7 @@ export default {
                         el.dataset.widthB = $(itemB).width();
                     },
                     drag: function(event) {
-                        if (Math.abs($el.position().left/el.dataset.parentW - el.dataset.initLRatio) > limit) {
+                        if (+Math.abs($el.position().left/el.dataset.parentW - el.dataset.initLRatio).toFixed(2) > limit) {
                             event.preventDefault();
 
                             var unlawLRatio = $el.position().left/el.dataset.parentW;
@@ -81,7 +94,7 @@ export default {
             left: 20%;
         }
         .R {
-            right: 20%;
+            left: 80%;
         }
     }
 </style>
