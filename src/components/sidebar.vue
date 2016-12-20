@@ -52,6 +52,7 @@ export default {
    props: ['itemX', 'itemY', 'limit'], 
 
    mounted : function() {
+           //数据分离
            var initDS = dataset.getinitDS(this);           
            var startDS;           
 
@@ -59,21 +60,22 @@ export default {
                     helper: false,  //remove jquery auto add relative;
                     axis: "x",
                     start: (event) => {
+                        //数据交互
                         startDS = dataset.getstartDS(initDS.$el, initDS.itemX, initDS.itemY);
                     },
-                    drag: (event) => {
-                        var dragDataset = dataset.getMoveDataset(initDS.$el.position().left, startDS.parentW, startDS.startL);
+                    drag: (event, ui) => {
+                        var dragDS = dataset.getMoveDataset(ui.position.left, startDS.parentW, startDS.startL);
 
-                        if (Math.abs(dragDataset.lRatio - initDS.lRatio) > initDS.limit) {
-                            initDS.$el.css("left", (dragDataset.lRatio > initDS.lRatio ? initDS.rRule : initDS.lRule) + "%");
+                        if (Math.abs(dragDS.lRatio - initDS.lRatio) > initDS.limit) {
+                            ui.position.left = ((dragDS.lRatio > initDS.lRatio ? initDS.rRule : initDS.lRule) * startDS.parentW / 100);
                             event.preventDefault();
+                        } else {
+                            $(startDS.itemX).width(startDS.widthX + dragDS.offset);
+                            $(startDS.itemY).width(startDS.widthY - dragDS.offset);
                         } 
-
-                        $(startDS.itemX).width(startDS.widthX + dragDataset.offset);
-                        $(startDS.itemY).width(startDS.widthY - dragDataset.offset);
                     },
-                    stop:function(event) {
-                        var stopDS = dataset.getMoveDataset(initDS.$el.position().left, startDS.parentW, startDS.startL);
+                    stop:function(event, ui) {
+                        var stopDS = dataset.getMoveDataset(ui.position.left, startDS.parentW, startDS.startL);
 
                         $(startDS.itemX).width(utils.divisionTofixed(startDS.widthX + stopDS.offset, startDS.parentW) + "%");
                         $(startDS.itemY).width(utils.divisionTofixed(startDS.widthY - stopDS.offset, startDS.parentW) + "%");
