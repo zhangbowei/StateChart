@@ -28,7 +28,8 @@ module.exports = {
         alias: {
             vue: 'vue/dist/vue.js', //webpack打包时，需要设置别名
             components: path.join(__dirname, './src/components'),
-            modules: path.join(__dirname, './node_modules')
+            modules: path.join(__dirname, './node_modules'),
+            store: path.resolve('src/store/') //常用工具方法
         }
     },
     resolveLoader: {

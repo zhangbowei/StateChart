@@ -1,9 +1,10 @@
 <script>
 import Sidebar from 'components/sidebar';
-import Box from 'components/box';
+import Search from 'components/Search';
+import List from 'components/List';
 
 export default {
-    components: { Sidebar, Box},
+    components: { Sidebar, Search, List},
     directives: {
 
     }
@@ -12,11 +13,18 @@ export default {
 
 <template>
     <div class="sketch">
-        <Box class="BoxA"></Box>
-        <Sidebar class="L" itemX=".BoxA" itemY=".BoxB" limit="10%"></Sidebar>
-        <Box class="BoxB"></Box>
-        <Sidebar class="R" itemX=".BoxB" itemY=".BoxC" limit="10%"></Sidebar>
-        <Box class="BoxC"></Box>
+        <div class="Box BoxA">
+            <Search></Search>
+            <List></List>
+        </div>
+        <Sidebar class="L" itemX=".BoxA" itemY=".BoxB" limit="15%"></Sidebar>
+        <div class="Box BoxB">
+
+        </div>
+        <Sidebar class="R" itemX=".BoxB" itemY=".BoxC" limit="15%"></Sidebar>
+        <div class="Box BoxC">
+
+        </div>
     </div>
 </template>
 
@@ -25,6 +33,12 @@ export default {
         position: absolute;
         height: 100%;
         width: 100%;
+        .Box {
+            float: left;
+            background-color: cadetblue;
+            width: 20%;
+            height: 100%;
+        }
         .BoxB {
             width: 60%;
             background-color: teal;
