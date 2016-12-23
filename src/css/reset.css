@@ -4,10 +4,15 @@ html, body {
 }
 html {
        font-size:1em;
+       font-family: 'Courier New';
 } 
 body {
        font-size:100%;
 } 
 a img, :link img, :visited img {
        border:0px;
-} 
+}
+*, *:before, *:after {
+	box-sizing: border-box;
+}
+* {margin:0;padding:0;border: 0 none;}

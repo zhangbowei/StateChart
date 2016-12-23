@@ -4,7 +4,7 @@ var webpack = require('webpack')
 module.exports = {
     // 入口文件
     entry: {
-        main : './src/main.js'
+        main: './src/main.js'
     },
     output: {
         // 打包后输出的目录
@@ -32,36 +32,48 @@ module.exports = {
             store: path.resolve('src/store/') //常用工具方法
         }
     },
-    resolveLoader: {
-        root: path.join(__dirname, 'node_modules')
-    },
     // 处理不同后缀的文件
     module: {
-        loaders: [{
-            test: /\.vue$/,
-            loader: 'vue'
-        }, {
-            test: /\.js$/,
-            loader: 'babel',
-            exclude: /node_modules/
-        }, {
-            test: /\.css$/,
-            loader: 'style-loader!css-loader'
-        }, {
-            test: /\.less$/,
-            loader: 'style-loader!css-loader!less-loader'
-        }, {
-            test: /\.(png|jpg|gif|svg)$/,
-            loader: 'file',
-            query: {
-                name: '[name].[ext]?[hash]'
+        loaders: [
+            {
+                test: /\.js(x)*$/,
+                exclude: /^node_modules$/,
+                loader: 'babel'
+            },
+            {
+                test: /\.vue$/,
+                loader: 'vue'
+            },
+            {
+                test: /\.css/,
+                loader: `style-loader!css-loader!autoprefixer-loader?{ browsers: ['last 100 versions'] }!`
+            },
+            {
+                test: /\.less/,
+                exclude: /^node_modules$/,
+                loader: `style-loader!css-loader!autoprefixer-loader?{ browsers: ['last 100 versions'] }!less-loader`
+            },
+            {
+                test: /\.(png|jpg)$/,
+                loader: 'url?limit=2000&name=[name].[ext]' //注意后面那个limit的参数，当你图片大小小于这个限制的时候，会自动启用base64编码图片
+            },
+            {
+                test: /\.(eot|woff|svg|ttf|woff2|gif|appcache)(\?|$)/,
+                loader: 'file-loader?name=[name].[ext]'
             }
-        }]
+        ]
     },
     // webpack-dev-server配置
     devServer: {
         historyApiFallback: true,
         noInfo: true
+    },
+    vue: {
+        postcss: [
+            require('autoprefixer')({
+                browsers: ['last 100 versions']
+            })
+        ]
     },
     // 开启source-map，webpack有多种source-map，在官网文档可以查到
     devtool: '#source-map'

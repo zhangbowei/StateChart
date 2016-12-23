@@ -33,15 +33,15 @@ export default {
         position: absolute;
         height: 100%;
         width: 100%;
+        background-color: #21444D;
         .Box {
             float: left;
-            background-color: cadetblue;
             width: 20%;
             height: 100%;
         }
         .BoxB {
             width: 60%;
-            background-color: teal;
+            background-color: #21444D;
         }
         .L {
             left: 20%;

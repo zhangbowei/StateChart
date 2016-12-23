@@ -1,52 +1,106 @@
 <script>
 import { mapState } from 'vuex';
+import Region from './region';
+import State from './state';
+import Introduction from './introduction';
 
 export default {
+    data() {
+        return {
+            convert: true
+        };
+    },
+    components: { Region, State, Introduction},
     computed: mapState({
-        sessions: state => {
-            const core = state.core;
-            const result = core.sessions.filter(session => session.user.name.includes(core.filterKey));
-            return result;
-        }
+        datasets: state => state.card.datasets.filter(data => data.name.includes(state.card.filterKey))
     }) 
 };
 </script>
 
 <template>
-<div class="list">
-    <ul>
-        <li v-for="item in sessions">
-            <img class="avatar"  width="30" height="30" :alt="item.user.name" :src="item.user.img">
-            <p class="name">{{item.user.name}}</p>
-        </li>
-    </ul> 
+    <div class="wrapper" :class="{'list-mode': convert}">
+ 	<header>
+    	<a href="javascript:void(0)" class="hide-list" @click="convert=false"><i class="fa fa-th"></i></a>
+        <a href="javascript:void(0)" class="show-list" @click="convert=true"><i class="fa fa-th-list"></i></a>
+    </header>
+    <div class="container">
+    	<div class="box" v-for="item in datasets">
+			<div :is="item.component"></div>
+			<Introduction v-if="convert" :content="item"></Introduction>
+		</div>
+    </div>
 </div>
 </template>
 
 <style scoped lang="less">
-.list {
-    li {
-        padding: 12px 15px;
-        border-bottom: 1px solid #292C33;
-        cursor: pointer;
-        transition: background-color .1s;
 
-        &:hover {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
-        &.active {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-    }
-    .avatar, .name {
-        vertical-align: middle;
-    }
-    .avatar {
-        border-radius: 2px;
-    }
-    .name {
-        display: inline-block;
-        margin: 0 0 0 15px;
-    }
+a{
+    transition: all 0.3s ease;
+}
+
+.wrapper{
+	margin: 5px 0px;
+    border-radius: 10em;
+	box-sizing: border-box;
+}
+
+header{
+	text-align:right;
+	padding: 1px;
+	margin-bottom: 5px;
+	background-color: #4F6C75;
+}
+
+header a{
+	font-size:20px;
+	color:#93A1A1;
+	width:32px;
+	height:32px;
+	line-height:32px;
+	margin-left:10px;
+	text-align:center;
+	display:inline-block;
+}
+
+header a:hover, .list-mode header a.hide-list:hover{
+	background-color:#7E9496;
+}
+
+header a.hide-list{
+	background-color:#7E9496;
+}
+.list-mode header a.hide-list{
+	background-color:#4F6C75;
+}
+
+.list-mode header a.show-list{
+	background-color:#7E9496;
+}
+
+.container:after{
+	content:"";
+	clear:both;
+	display:table;
+}
+
+.container{
+	margin:10px 0px;
+}
+.wrapper .box{
+	float:left;
+	overflow: hidden;
+	width:60px;
+	height:60px;
+	margin: 0px 5px 5px 0px;
+	transition:all 1.0s ease;
+    border-bottom: solid 1px #4F6C75;
+}
+
+.wrapper.list-mode .container{
+	padding-right:0px;
+}
+
+.wrapper.list-mode .box{
+	width:100%;
 }
 </style>
