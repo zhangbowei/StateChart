@@ -65,5 +65,15 @@ css3 transform 与 svg transform 不同。
 
 g标签可以设置css3 transform, 但会使svg  transform失效。
 
+###z-index
+SVG内部元素不识别z-index, 谁（e.g g标签)挂载在最后，谁就显示在最上面.
+
 ##总结
 综上SVG包含css2基本属性／css3, 但与css3属性重名者，svg属性实效。所以svg尽量不要使用css设置（那是css3),直接食用库来操作SVG内部元素。
+
+> !!{}
+> true
+> if ({}) {console.log('ok')}
+> ok}
+
+
