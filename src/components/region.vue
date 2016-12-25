@@ -1,14 +1,18 @@
 <script>
 
 export default {
+    methods: {
+        render(e) {
+            console.log(e);
+        }
+    }
 };
 </script>
 
 <template>
-    <svg class="sketch">
+    <svg class="sketch" >
         <g class="configure">
             <rect class="background"></rect>
-
             <path class="separator" d="M0,15 L60,15"></path>
             <text class="name">
                 <tspan>State</tspan>
@@ -28,7 +32,7 @@ export default {
         height: 60px;
         cursor: move;
         .configure {
-            transform: scale(1, 1);
+            cursor: move;
         }
         .background {
             width: 60px;

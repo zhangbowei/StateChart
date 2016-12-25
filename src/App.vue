@@ -2,9 +2,10 @@
 import Sidebar from 'components/sidebar';
 import Search from 'components/Search';
 import List from 'components/List';
+import Palette from 'components/palette';
 
 export default {
-    components: { Sidebar, Search, List},
+    components: { Sidebar, Search, List, Palette},
     directives: {
 
     }
@@ -13,15 +14,13 @@ export default {
 
 <template>
     <div class="sketch">
-        <div class="Box BoxA">
+        <div class="Box menu">
             <Search></Search>
             <List></List>
         </div>
-        <Sidebar class="L" itemX=".BoxA" itemY=".BoxB" limit="15%"></Sidebar>
-        <div class="Box BoxB">
-
-        </div>
-        <Sidebar class="R" itemX=".BoxB" itemY=".BoxC" limit="15%"></Sidebar>
+        <Sidebar class="L" itemX=".menu" itemY=".workspace" limit="15%"></Sidebar>
+        <Palette class="Box workspace"></Palette>
+        <Sidebar class="R" itemX=".workspace" itemY=".BoxC" limit="15%"></Sidebar>
         <div class="Box BoxC">
 
         </div>
@@ -39,7 +38,7 @@ export default {
             width: 20%;
             height: 100%;
         }
-        .BoxB {
+        .workspace {
             width: 60%;
             background-color: #21444D;
         }

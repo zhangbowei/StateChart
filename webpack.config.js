@@ -18,7 +18,8 @@ module.exports = {
             $: "jquery",
             jQuery: "jquery",
             "window.jQuery": "jquery",
-            _: "underscore"
+            _: "underscore",
+            V: "vendor/vectorizer"
         })
     ],
     resolve: {
@@ -29,7 +30,8 @@ module.exports = {
             vue: 'vue/dist/vue.js', //webpack打包时，需要设置别名
             components: path.join(__dirname, './src/components'),
             modules: path.join(__dirname, './node_modules'),
-            store: path.resolve('src/store/') //常用工具方法
+            store: path.resolve('src/store/'), //常用工具方法
+            vendor: path.resolve('src/vendor/') 
         }
     },
     // 处理不同后缀的文件
