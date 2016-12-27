@@ -1,17 +1,27 @@
 <script>
+import {wrapNameSelector} from "../utils";
+import Toolbox from "./toolbox";
+import { mapState } from 'vuex';
+
 
 export default {
-    methods: {
-        render(e) {
-            console.log(e);
-        }
-    }
+    components: { Toolbox},
+    computed: mapState({
+        rootName: state => state.tool.root.name,
+        scaleName: state => state.tool.scale.name,
+        boxName: state => state.tool.box.name
+    }),
+    mounted: function() {
+       //tanslate scale item. 
+       V(this.$el.querySelector(wrapNameSelector(this.scaleName))).translate(60, 60);
+       this.$el.querySelector(wrapNameSelector(this.boxName)).setAttribute('display', 'none'); 
+    } 
 };
 </script>
 
 <template>
-    <svg class="sketch" >
-        <g class="configure">
+    <svg class="sketch">
+        <g class="configure" :name="rootName">
             <rect class="background"></rect>
             <path class="separator" d="M0,15 L60,15"></path>
             <text class="name">
@@ -22,6 +32,7 @@ export default {
                 <tspan dy="1em" x="0">test</tspan>
                 <tspan dy="1em" x="0">test</tspan>
             </text>
+            <Toolbox></Toolbox>
         </g>
     </svg>
 </template>

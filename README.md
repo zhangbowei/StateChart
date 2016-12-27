@@ -71,9 +71,18 @@ SVG内部元素不识别z-index, 谁（e.g g标签)挂载在最后，谁就显�
 ##总结
 综上SVG包含css2基本属性／css3, 但与css3属性重名者，svg属性实效。所以svg尽量不要使用css设置（那是css3),直接食用库来操作SVG内部元素。
 
+SVG 内部标签 不支持 事件。（click, mousedown等）
+
+通信不只是传递信息，也应该将约定的信息提取出来解耦，以免被不知情的更改。
+
 > !!{}
 > true
 > if ({}) {console.log('ok')}
 > ok}
 
+##toolBox
+###scale
+// const originaldata = el.getBBox(); //getBBox()值初始化后，永远不会变（要不scale怎么能用)
+
+###
 

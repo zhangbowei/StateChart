@@ -1,5 +1,5 @@
 <script>
-import utils from '../utils';
+import {divisionTofixed} from '../utils';
 
 var dataset = {
     getinitDS(that) {
@@ -8,7 +8,7 @@ var dataset = {
            var itemY = that.itemY;
            var limit = parseInt(that.limit);
 
-           var lRatio = utils.divisionTofixed($el.position().left, $el.parent().width());
+           var lRatio = divisionTofixed($el.position().left, $el.parent().width());
            var lRule = lRatio - limit;
            var rRule = lRatio + limit;
 
@@ -39,7 +39,7 @@ var dataset = {
         };
     },
     getMoveDataset(nowL, parentW, startL) {
-        var lRatio = utils.divisionTofixed(nowL, parentW);
+        var lRatio = divisionTofixed(nowL, parentW);
         var offset = nowL - startL;
         return {
             lRatio: lRatio,
@@ -77,8 +77,8 @@ export default {
                     stop:function(event, ui) {
                         var stopDS = dataset.getMoveDataset(ui.position.left, startDS.parentW, startDS.startL);
 
-                        $(startDS.itemX).width(utils.divisionTofixed(startDS.widthX + stopDS.offset, startDS.parentW) + "%");
-                        $(startDS.itemY).width(utils.divisionTofixed(startDS.widthY - stopDS.offset, startDS.parentW) + "%");
+                        $(startDS.itemX).width(divisionTofixed(startDS.widthX + stopDS.offset, startDS.parentW) + "%");
+                        $(startDS.itemY).width(divisionTofixed(startDS.widthY - stopDS.offset, startDS.parentW) + "%");
                         initDS.$el.css("left", stopDS.lRatio + "%");
                     }
            });

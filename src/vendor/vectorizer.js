@@ -657,6 +657,7 @@ V = Vectorizer = (function() {
             try {
 
                 var globalPoint = p.matrixTransform(svg.getScreenCTM().inverse());
+                var globalToLocalMatrix = this.node.getTransformToElement(svg).inverse();
 
             } catch (e) {
                 // IE9 throws an exception in odd cases. (`Unexpected call to method or property access`)
@@ -664,7 +665,7 @@ V = Vectorizer = (function() {
                 return p;
             }
 
-            return globalPoint;
+            return globalPoint.matrixTransform(globalToLocalMatrix);
         },
 
         translateCenterToPoint: function(p) {
@@ -1364,6 +1365,9 @@ V = Vectorizer = (function() {
 
 })();
 
+SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformToElement || function (toElement) {
+            return toElement.getScreenCTM().inverse().multiply(this.getScreenCTM());
+};
 
 module.exports = V;
 
