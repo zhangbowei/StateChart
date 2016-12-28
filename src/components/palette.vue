@@ -7,6 +7,7 @@ import { SET_ROOT_METHOD } from 'store/tool';
 export default {
     data() {
         return {
+            //this component: choosed component to do its logic function by "click and move"
             component: undefined,
             svg: undefined
         }
@@ -27,14 +28,16 @@ export default {
             } 
             return null;
         },
-        root: function() {
-            return findParentByName(this.component, this.rootName);
-        },
         boxName: state => state.tool.box.name,
         rootName: state => state.tool.root.name
     }),
     methods: {
         ...mapActions([SET_ROOT_METHOD]),
+        //get Variables
+        root: function(el) {
+            return findParentByName(el, this.rootName);
+        },
+        //logic function
         changeRoot(el, e) {
             V(el).translate(~~e.movementX, ~~e.movementY); 
         },
@@ -42,17 +45,28 @@ export default {
             if (!!e.target.ownerSVGElement) {
                 this.component = findParentByName(e.target, this.nameSet);
                 //make choosed component on the top.
-                this.svg.appendChild(this.root);
+                this.svg.appendChild(this.root(this.component));
             }
         },
         moveComponent: function(e) {
             if(!!this.component) {
-                this.method ? this.method(this.root, e) : null;
+                this.method ? this.method(this.root(this.component), e) : null;
             } 
         },
         removeComponent: function(e) {
             this.component = undefined;
         },
+        //UX function 
+        displayTool: function(e) {
+            if (!!e.target.ownerSVGElement) {
+                this.root(e.target).querySelector(wrapNameSelector(this.boxName)).setAttribute('display', 'block'); 
+            } 
+        },
+        hideTool: function(e) {
+            if (!!e.target.ownerSVGElement) {
+                this.root(e.target).querySelector(wrapNameSelector(this.boxName)).setAttribute('display', 'none');
+            }
+        }
     },
     created: function() {
         this[SET_ROOT_METHOD](this.changeRoot);        
@@ -67,8 +81,6 @@ export default {
                 const vel = V(ui.helper[0].querySelector(wrapNameSelector(this.rootName)));
 
                 vel.translate(~~point.x, ~~point.y);
-                vel.node.querySelector(wrapNameSelector(this.boxName)).setAttribute('display', 'block'); 
-
                 this.svg.appendChild(vel.node);
             }
         });
@@ -78,7 +90,7 @@ export default {
 
 <template>
     <div>
-        <svg class="sketch" @mousemove="moveComponent" @mouseup="removeComponent" @mousedown="chooseComponent"></svg>
+        <svg class="sketch" @mousemove="moveComponent" @mouseup="removeComponent" @mousedown="chooseComponent" @mouseover="displayTool" @mouseout="hideTool"></svg>
     </div>
 </template>
 

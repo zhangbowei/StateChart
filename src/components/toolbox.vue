@@ -6,6 +6,7 @@ import { SET_SCALE_METHOD } from 'store/tool';
 export default {
     computed: mapState({
         scaleName: state => state.tool.scale.name,
+        linkName: state => state.tool.link.name,
         boxName: state => state.tool.box.name
     }),
     methods: {
@@ -26,7 +27,11 @@ export default {
 
 <template>
     <g :name="boxName">
-        <circle r="6" class="scale" :name="scaleName"></circle>
+        <circle class="scale" :name="scaleName"></circle>
+        <circle class="link" :name="linkName"></circle>
+        <circle class="link" :name="linkName"></circle>
+        <circle class="link" :name="linkName"></circle>
+        <circle class="link" :name="linkName"></circle>
     </g>
 </template>
 
@@ -34,5 +39,10 @@ export default {
     .scale {
         cursor: se-resize;
         opacity:0.0;
+        r: 6;
+    }
+    .link {
+        opacity:0.5;
+        r: 3;
     }
 </style>

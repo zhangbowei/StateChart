@@ -9,10 +9,15 @@ export default {
     computed: mapState({
         rootName: state => state.tool.root.name,
         scaleName: state => state.tool.scale.name,
+        linkName: state => state.tool.link.name,
         boxName: state => state.tool.box.name
     }),
     mounted: function() {
-       //tanslate scale item. 
+       const position = [{x: 0, y:30}, {x: 30, y:0}, {x: 30, y:60}, {x: 60, y:30}];
+       
+       this.$el.querySelectorAll(wrapNameSelector(this.linkName)).forEach(function(el, index) {
+           V(el).translate(position[index].x, position[index].y);
+       });
        V(this.$el.querySelector(wrapNameSelector(this.scaleName))).translate(60, 60);
        this.$el.querySelector(wrapNameSelector(this.boxName)).setAttribute('display', 'none'); 
     } 
