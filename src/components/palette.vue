@@ -1,15 +1,19 @@
 <script>
-import {wrapNameSelector, findParentByName} from "../utils";
+import {wrapNameSelector, findParentByName, makeMouseFirst} from "../utils";
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
-import { SET_ROOT_METHOD } from 'store/tool';
+import { SET_ROOT_METHOD, SET_LINK_METHOD} from 'store/tool';
+import PointLink from './pointLink';
 
 export default {
+    components: { PointLink},
     data() {
         return {
             //this component: choosed component to do its logic function by "click and move"
             component: undefined,
-            svg: undefined
+            svg: undefined,
+            //link
+            linkData: []
         }
     },
     computed: mapState({
@@ -29,10 +33,11 @@ export default {
             return null;
         },
         boxName: state => state.tool.box.name,
+        linkName: state => state.tool.link.name,
         rootName: state => state.tool.root.name
     }),
     methods: {
-        ...mapActions([SET_ROOT_METHOD]),
+        ...mapActions([SET_ROOT_METHOD, SET_LINK_METHOD]),
         //get Variables
         root: function(el) {
             return findParentByName(el, this.rootName);
@@ -41,35 +46,70 @@ export default {
         changeRoot(el, e) {
             V(el).translate(~~e.movementX, ~~e.movementY); 
         },
+        linkRoot(el, e) {
+            const dataSet = this.linkData;
+            
+            if (e.type === "mousedown") {
+                let box = V(el).bbox();
+                let start = {x: box.x, y: box.y, id: el.id};
+                let end = makeMouseFirst({x: e.offsetX, y: e.offsetY});
+
+                dataSet.push({start, end}); 
+            } 
+
+            if (e.type === "mousemove") {
+                let end = makeMouseFirst({x: e.offsetX, y: e.offsetY});
+                
+                dataSet[dataSet.length-1].end = end;
+            }
+
+            if (e.type === "mouseup") {
+                let data =  dataSet[dataSet.length-1];
+                let endEl = findParentByName(e.target, this.linkName);
+
+                if(!!endEl && data.start.id != endEl.id) {
+                    let box = V(endEl).bbox();
+                    let end = {x: box.x, y: box.y, id: endEl.id};
+                    dataSet[dataSet.length-1].end = end;
+                } else {
+                    dataSet.pop();
+                }
+            }
+        },
+        //event choose function
         chooseComponent: function(e) {
             if (!!e.target.ownerSVGElement) {
                 this.component = findParentByName(e.target, this.nameSet);
+                this.component ? this.method(this.component, e) : null;
+
                 //make choosed component on the top.
                 this.svg.appendChild(this.root(this.component));
             }
         },
         moveComponent: function(e) {
-            if(!!this.component) {
-                this.method ? this.method(this.root(this.component), e) : null;
-            } 
+            this.component ? this.method(this.component, e) : null;
         },
         removeComponent: function(e) {
+            this.component ? this.method(this.component, e) : null;
             this.component = undefined;
         },
         //UX function 
         displayTool: function(e) {
-            if (!!e.target.ownerSVGElement) {
-                this.root(e.target).querySelector(wrapNameSelector(this.boxName)).setAttribute('display', 'block'); 
+            const root = this.root(e.target);
+            if (!!root) {
+                root.querySelector(wrapNameSelector(this.boxName)).setAttribute('display', 'block'); 
             } 
         },
         hideTool: function(e) {
-            if (!!e.target.ownerSVGElement) {
-                this.root(e.target).querySelector(wrapNameSelector(this.boxName)).setAttribute('display', 'none');
+            const root = this.root(e.target);
+            if (!!root) {
+                root.querySelector(wrapNameSelector(this.boxName)).setAttribute('display', 'none');
             }
         }
     },
     created: function() {
         this[SET_ROOT_METHOD](this.changeRoot);        
+        this[SET_LINK_METHOD](this.linkRoot);
     },
     mounted() {
         this.svg = this.$el.querySelector('svg');
@@ -90,7 +130,9 @@ export default {
 
 <template>
     <div>
-        <svg class="sketch" @mousemove="moveComponent" @mouseup="removeComponent" @mousedown="chooseComponent" @mouseover="displayTool" @mouseout="hideTool"></svg>
+        <svg class="sketch" @mousemove="moveComponent" @mouseup="removeComponent" @mousedown="chooseComponent" @mouseover="displayTool" @mouseout="hideTool">
+            <PointLink  v-for="item in linkData" :data="item"></PointLink>
+        </svg>
     </div>
 </template>
 
@@ -98,5 +140,6 @@ export default {
     .sketch {
         width: 100%;
         height: 100%;
+        user-select:none;
     }
 </style>

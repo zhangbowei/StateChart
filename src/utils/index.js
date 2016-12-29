@@ -1,23 +1,35 @@
 export function divisionTofixed(x, y) {
-        return +((x / y) * 100).toFixed(2);
+    return +((x / y) * 100).toFixed(2);
 }
 
 export function wrapNameSelector(name) {
-        return ['[name=', name, ']'].join('');
+    return ['[name=', name, ']'].join('');
 }
 
 export function findParentByName(el, nameSet) {
 
-        const terminator = el.ownerSVGElement;
+    const terminator = el.ownerSVGElement;
 
-        while (el && el !== terminator) {
+    if (_.isNull(terminator)) {
+        return null;
+    }
 
-                if (nameSet.indexOf(el.getAttribute('name')) !== -1) {
-                        return el;
-                }
+    while (el && el !== terminator) {
 
-                el = el.parentNode;
+        if (nameSet.indexOf(el.getAttribute('name')) !== -1) {
+            return el;
         }
 
-        return null;
+        el = el.parentNode;
+    }
+
+    return null;
+}
+
+export function makeMouseFirst(data, offset) {
+    offset = offset || 1;
+    for (let item in data) {
+        data[item] -= offset;
+    }
+    return data;
 }

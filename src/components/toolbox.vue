@@ -1,18 +1,20 @@
 <script>
+import {findParentByName} from "../utils";
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
-import { SET_SCALE_METHOD } from 'store/tool';
+import { SET_SCALE_METHOD} from 'store/tool';
 
 export default {
     computed: mapState({
         scaleName: state => state.tool.scale.name,
         linkName: state => state.tool.link.name,
-        boxName: state => state.tool.box.name
+        boxName: state => state.tool.box.name,
+        rootName: state => state.tool.root.name
     }),
     methods: {
         ...mapActions([SET_SCALE_METHOD]),
         scaleRoot(el, e) {
-            const vel = V(el);
+            const vel = V(findParentByName(el, this.rootName));
             const originaldata = vel.bbox(true); 
             const newdata = vel.bbox();
 
@@ -42,7 +44,12 @@ export default {
         r: 6;
     }
     .link {
-        opacity:0.5;
-        r: 3;
+        cursor: crosshair;
+        fill-opacity: 0.8;
+        r: 2;
+        fill: #333333;
+        stroke:#333333;
+        stroke-width: 10;
+        stroke-opacity: 0.4;
     }
 </style>
