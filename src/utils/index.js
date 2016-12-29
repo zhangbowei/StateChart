@@ -27,7 +27,7 @@ export function findParentByName(el, nameSet) {
 }
 
 export function makeMouseFirst(data, offset) {
-    offset = offset || 1;
+    offset = Math.abs(offset) || 1;
     for (let item in data) {
         data[item] -= offset;
     }

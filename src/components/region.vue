@@ -33,9 +33,9 @@ export default {
                 <tspan>State</tspan>
             </text>
             <text class="event">
-                <tspan dy="0em">test</tspan>
-                <tspan dy="1em" x="0">test</tspan>
-                <tspan dy="1em" x="0">test</tspan>
+                <tspan dy="0em"></tspan>
+                <tspan dy="1em" x="0"></tspan>
+                <tspan dy="1em" x="0"></tspan>
             </text>
             <Toolbox></Toolbox>
         </g>

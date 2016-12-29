@@ -13,7 +13,8 @@ export default {
             component: undefined,
             svg: undefined,
             //link
-            linkData: []
+            linkData: [],
+            eventHappenedNum: null
         }
     },
     computed: mapState({
@@ -58,8 +59,8 @@ export default {
             } 
 
             if (e.type === "mousemove") {
-                let end = makeMouseFirst({x: e.offsetX, y: e.offsetY});
-                
+                let end = makeMouseFirst({x: e.offsetX, y: e.offsetY}, 5);
+
                 dataSet[dataSet.length-1].end = end;
             }
 
@@ -71,6 +72,28 @@ export default {
                     let box = V(endEl).bbox();
                     let end = {x: box.x, y: box.y, id: endEl.id};
                     dataSet[dataSet.length-1].end = end;
+                    dataSet[dataSet.length-1].startRoot = this.root(el);
+                    dataSet[dataSet.length-1].endRoot = this.root(endEl);
+
+
+                    var vm = this;
+                    let endIndex = dataSet.length-1;
+                    vm.$watch(function() {
+                        this.eventHappenedNum;
+                        return this.linkData[endIndex].startRoot.attributes.transform.value;
+                    }, function() {
+                        let box = V(el).bbox();
+                        dataSet[endIndex].start.x = box.x; 
+                        dataSet[endIndex].start.y = box.y; 
+                    });
+                    vm.$watch(function() {
+                        this.eventHappenedNum;
+                        return this.linkData[endIndex].endRoot.attributes.transform.value;
+                    }, function() {
+                        let box = V(endEl).bbox();
+                        dataSet[endIndex].end.x = box.x; 
+                        dataSet[endIndex].end.y = box.y; 
+                    });
                 } else {
                     dataSet.pop();
                 }
@@ -84,14 +107,17 @@ export default {
 
                 //make choosed component on the top.
                 this.svg.appendChild(this.root(this.component));
+                this.eventHappenedNum ++;
             }
         },
         moveComponent: function(e) {
             this.component ? this.method(this.component, e) : null;
+            this.eventHappenedNum ++;
         },
         removeComponent: function(e) {
             this.component ? this.method(this.component, e) : null;
             this.component = undefined;
+            this.eventHappenedNum ++;
         },
         //UX function 
         displayTool: function(e) {
@@ -121,6 +147,7 @@ export default {
                 const vel = V(ui.helper[0].querySelector(wrapNameSelector(this.rootName)));
 
                 vel.translate(~~point.x, ~~point.y);
+                vel.node.querySelector(wrapNameSelector(this.boxName)).setAttribute('display', 'block');
                 this.svg.appendChild(vel.node);
             }
         });
@@ -130,8 +157,9 @@ export default {
 
 <template>
     <div>
-        <svg class="sketch" @mousemove="moveComponent" @mouseup="removeComponent" @mousedown="chooseComponent" @mouseover="displayTool" @mouseout="hideTool">
-            <PointLink  v-for="item in linkData" :data="item"></PointLink>
+        <svg class="sketch" @mousemove="moveComponent" @mouseup="removeComponent" @mousedown="chooseComponent" @mouseover="displayTool"
+            @mouseout="hideTool">
+            <PointLink v-for="item in linkData" :data="item"></PointLink>
         </svg>
     </div>
 </template>
@@ -140,6 +168,7 @@ export default {
     .sketch {
         width: 100%;
         height: 100%;
-        user-select:none;
+        user-select: none;
+        cursor: default;
     }
 </style>

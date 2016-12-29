@@ -14,13 +14,15 @@ export default {
 
 <template>
     <g class="link">
-        <path :d="pathD" stroke="#888"></path>
+        <path :d="pathD"></path>
     </g>
 </template>
 
 <style scoped lang="less">
     .link {
         cursor: crosshair;
-        opacity:0.5;
+        opacity:0.8;
+        stroke:#93A1A1; 
+        stroke-width: 3;
     }
 </style>
