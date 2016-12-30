@@ -101,3 +101,20 @@ vue watch 一个 this.test.a.b.c, 如果this.test本身没有增删，是不会�
                     })
 ```
 >上述代码加入了this.eventHappenedNum以捕捉事件，启动watch,watch启动后，会检测this.eventHappenedNum(肯定变了），再检测this.linkData[..].....(this.linkData中绑定的DOM对象变更虽然改变了transoform.value值，但如上面说过的，没有直接操作this.linkData或其属性，所以watch不会启动。)
+
+```
+            this.$watch(() => {
+                this.eventHappenedNum;
+                return this.root(data.startEl).attributes.transform.value;
+            }, function() {
+                const box = V(data.startEl).bbox();
+                data.start.x = box.x;
+                data.start.y = box.y;
+            })
+```
+** this.eventHappenedNum与this.root(da...)...值变更 决定了 watch 检测是否开启，
+
+return 返回值是否改变，决定了回调函数是否执行（const box.....)
+
+所以 return this.eventHappenedNum + this.root.... 会一直触发回调函数
+**

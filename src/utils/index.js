@@ -33,3 +33,18 @@ export function makeMouseFirst(data, offset) {
     }
     return data;
 }
+
+export function addEventListener(events, el, func) {
+    events.forEach(function(event) {
+        el.addEventListener(event, func);
+    });
+}
+
+const utils = {
+   wrapNameSelector,
+   findParentByName,
+   makeMouseFirst, 
+   addEventListener
+};
+
+export default utils;

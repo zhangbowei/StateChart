@@ -1,5 +1,5 @@
 <script>
-import {wrapNameSelector, findParentByName, makeMouseFirst} from "../utils";
+import utils from "../utils";
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { SET_ROOT_METHOD, SET_LINK_METHOD} from 'store/tool';
@@ -14,7 +14,7 @@ export default {
             svg: undefined,
             //link
             linkData: [],
-            eventHappenedNum: null
+            eventHappened: true
         }
     },
     computed: mapState({
@@ -41,95 +41,100 @@ export default {
         ...mapActions([SET_ROOT_METHOD, SET_LINK_METHOD]),
         //get Variables
         root: function(el) {
-            return findParentByName(el, this.rootName);
+            return utils.findParentByName(el, this.rootName);
         },
         //logic function
         changeRoot(el, e) {
             V(el).translate(~~e.movementX, ~~e.movementY); 
         },
+
         linkRoot(el, e) {
             const dataSet = this.linkData;
+            const endIndex = dataSet.length-1;
             
             if (e.type === "mousedown") {
                 let box = V(el).bbox();
                 let start = {x: box.x, y: box.y, id: el.id};
-                let end = makeMouseFirst({x: e.offsetX, y: e.offsetY});
+                let end = utils.makeMouseFirst({x: e.offsetX, y: e.offsetY});
 
                 dataSet.push({start, end}); 
             } 
 
             if (e.type === "mousemove") {
-                let end = makeMouseFirst({x: e.offsetX, y: e.offsetY}, 5);
-
-                dataSet[dataSet.length-1].end = end;
+                let end = utils.makeMouseFirst({x: e.offsetX, y: e.offsetY}, 5);
+                dataSet[endIndex].end = end;
             }
 
             if (e.type === "mouseup") {
-                let data =  dataSet[dataSet.length-1];
-                let endEl = findParentByName(e.target, this.linkName);
+                let endEl = utils.findParentByName(e.target, this.linkName);
 
-                if(!!endEl && data.start.id != endEl.id) {
+                if(!!endEl && dataSet[endIndex].start.id != endEl.id) {
                     let box = V(endEl).bbox();
                     let end = {x: box.x, y: box.y, id: endEl.id};
-                    dataSet[dataSet.length-1].end = end;
-                    dataSet[dataSet.length-1].startRoot = this.root(el);
-                    dataSet[dataSet.length-1].endRoot = this.root(endEl);
-
-
-                    var vm = this;
-                    let endIndex = dataSet.length-1;
-                    vm.$watch(function() {
-                        this.eventHappenedNum;
-                        return this.linkData[endIndex].startRoot.attributes.transform.value;
-                    }, function() {
-                        let box = V(el).bbox();
-                        dataSet[endIndex].start.x = box.x; 
-                        dataSet[endIndex].start.y = box.y; 
-                    });
-                    vm.$watch(function() {
-                        this.eventHappenedNum;
-                        return this.linkData[endIndex].endRoot.attributes.transform.value;
-                    }, function() {
-                        let box = V(endEl).bbox();
-                        dataSet[endIndex].end.x = box.x; 
-                        dataSet[endIndex].end.y = box.y; 
-                    });
+                    dataSet[endIndex].end = end;
+                    dataSet[endIndex].startEl = el;
+                    dataSet[endIndex].endEl = endEl;
+                    //watch&follow related pointed  changed 
+                    this.watchLink(endIndex);
                 } else {
                     dataSet.pop();
                 }
             }
         },
+
+        triggerWatch: function() {
+            this.eventHappened = this.eventHappened ? false : true;
+        },
+
+        watchLink: function(index) {
+            const data = this.linkData[index];
+
+            this.$watch(() => {
+                this.eventHappened; 
+                return this.root(data.startEl).attributes.transform.value;
+            }, function() {
+                const box = V(data.startEl).bbox();
+                data.start.x = box.x;
+                data.start.y = box.y;
+            });
+
+            this.$watch(() => {
+                this.eventHappened; 
+                return this.root(data.endEl).attributes.transform.value;
+            }, function() {
+                const box = V(data.endEl).bbox();
+                data.end.x = box.x;
+                data.end.y = box.y;
+            });
+        },
         //event choose function
         chooseComponent: function(e) {
             if (!!e.target.ownerSVGElement) {
-                this.component = findParentByName(e.target, this.nameSet);
+                this.component = utils.findParentByName(e.target, this.nameSet);
                 this.component ? this.method(this.component, e) : null;
 
                 //make choosed component on the top.
                 this.svg.appendChild(this.root(this.component));
-                this.eventHappenedNum ++;
             }
         },
         moveComponent: function(e) {
             this.component ? this.method(this.component, e) : null;
-            this.eventHappenedNum ++;
         },
         removeComponent: function(e) {
             this.component ? this.method(this.component, e) : null;
             this.component = undefined;
-            this.eventHappenedNum ++;
         },
         //UX function 
         displayTool: function(e) {
             const root = this.root(e.target);
             if (!!root) {
-                root.querySelector(wrapNameSelector(this.boxName)).setAttribute('display', 'block'); 
+                root.querySelector(utils.wrapNameSelector(this.boxName)).setAttribute('display', 'block'); 
             } 
         },
         hideTool: function(e) {
             const root = this.root(e.target);
             if (!!root) {
-                root.querySelector(wrapNameSelector(this.boxName)).setAttribute('display', 'none');
+                root.querySelector(utils.wrapNameSelector(this.boxName)).setAttribute('display', 'none');
             }
         }
     },
@@ -144,14 +149,16 @@ export default {
             accept: 'svg',
             drop: (e, ui) => {
                 const point = V(this.svg).toLocalPoint(ui.position.left, ui.position.top);
-                const vel = V(ui.helper[0].querySelector(wrapNameSelector(this.rootName)));
+                const vel = V(ui.helper[0].querySelector(utils.wrapNameSelector(this.rootName)));
 
                 vel.translate(~~point.x, ~~point.y);
-                vel.node.querySelector(wrapNameSelector(this.boxName)).setAttribute('display', 'block');
+                vel.node.querySelector(utils.wrapNameSelector(this.boxName)).setAttribute('display', 'block');
                 this.svg.appendChild(vel.node);
             }
         });
-    } 
+
+        utils.addEventListener(['mousemove', 'mouseup', 'mousedown'], this.$el, this.triggerWatch);
+    }
 };
 </script>
 
