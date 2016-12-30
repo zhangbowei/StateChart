@@ -40,11 +40,28 @@ export function addEventListener(events, el, func) {
     });
 }
 
+export function curryIt(fn) {
+    const len = fn.length;
+    const args = [];
+    
+    const func = function(num) {
+        args.push(num);
+        if (args.length === len) {
+            return () => fn.apply(null, args);
+        } else {
+            return func;
+        }
+    }
+    
+    return func;
+}
+
 const utils = {
    wrapNameSelector,
    findParentByName,
    makeMouseFirst, 
-   addEventListener
+   addEventListener,
+   curryIt
 };
 
 export default utils;

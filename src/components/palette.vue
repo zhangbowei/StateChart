@@ -14,7 +14,7 @@ export default {
             svg: undefined,
             //link
             linkData: [],
-            eventHappened: true
+            eventTurn: true
         }
     },
     computed: mapState({
@@ -40,14 +40,16 @@ export default {
     methods: {
         ...mapActions([SET_ROOT_METHOD, SET_LINK_METHOD]),
         //get Variables
-        root: function(el) {
+        findRoot: function(el) {
             return utils.findParentByName(el, this.rootName);
+        },
+        updateEventTurn: function() {
+            this.eventTurn = this.eventTurn ? false : true;
         },
         //logic function
         changeRoot(el, e) {
             V(el).translate(~~e.movementX, ~~e.movementY); 
         },
-
         linkRoot(el, e) {
             const dataSet = this.linkData;
             const endIndex = dataSet.length-1;
@@ -74,7 +76,7 @@ export default {
                     dataSet[endIndex].end = end;
                     dataSet[endIndex].startEl = el;
                     dataSet[endIndex].endEl = endEl;
-                    //watch&follow related pointed  changed 
+                    
                     this.watchLink(endIndex);
                 } else {
                     dataSet.pop();
@@ -82,31 +84,29 @@ export default {
             }
         },
 
-        triggerWatch: function() {
-            this.eventHappened = this.eventHappened ? false : true;
+        //watch&follow related pointed  changed 
+        triggerWatchLink: function(el) {
+            this.eventTurn; 
+            return this.findRoot(el).attributes.transform.value;
         },
-
         watchLink: function(index) {
             const data = this.linkData[index];
+            const watchPointStart = utils.curryIt(this.triggerWatchLink)(data.startEl);
+            const watchPointEnd = utils.curryIt(this.triggerWatchLink)(data.endEl);
 
-            this.$watch(() => {
-                this.eventHappened; 
-                return this.root(data.startEl).attributes.transform.value;
-            }, function() {
+            this.$watch(watchPointStart, function() {
                 const box = V(data.startEl).bbox();
                 data.start.x = box.x;
                 data.start.y = box.y;
             });
 
-            this.$watch(() => {
-                this.eventHappened; 
-                return this.root(data.endEl).attributes.transform.value;
-            }, function() {
+            this.$watch(watchPointEnd, function() {
                 const box = V(data.endEl).bbox();
                 data.end.x = box.x;
                 data.end.y = box.y;
             });
         },
+
         //event choose function
         chooseComponent: function(e) {
             if (!!e.target.ownerSVGElement) {
@@ -114,7 +114,7 @@ export default {
                 this.component ? this.method(this.component, e) : null;
 
                 //make choosed component on the top.
-                this.svg.appendChild(this.root(this.component));
+                this.svg.appendChild(this.findRoot(this.component));
             }
         },
         moveComponent: function(e) {
@@ -124,15 +124,16 @@ export default {
             this.component ? this.method(this.component, e) : null;
             this.component = undefined;
         },
+        
         //UX function 
         displayTool: function(e) {
-            const root = this.root(e.target);
+            const root = this.findRoot(e.target);
             if (!!root) {
                 root.querySelector(utils.wrapNameSelector(this.boxName)).setAttribute('display', 'block'); 
             } 
         },
         hideTool: function(e) {
-            const root = this.root(e.target);
+            const root = this.findRoot(e.target);
             if (!!root) {
                 root.querySelector(utils.wrapNameSelector(this.boxName)).setAttribute('display', 'none');
             }
@@ -157,7 +158,7 @@ export default {
             }
         });
 
-        utils.addEventListener(['mousemove', 'mouseup', 'mousedown'], this.$el, this.triggerWatch);
+        utils.addEventListener(['mousemove', 'mouseup', 'mousedown'], this.$el, this.updateEventTurn);
     }
 };
 </script>
