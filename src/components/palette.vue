@@ -39,6 +39,7 @@ export default {
     }),
     methods: {
         ...mapActions([SET_ROOT_METHOD, SET_LINK_METHOD]),
+        
         //get Variables
         findRoot: function(el) {
             return utils.findParentByName(el, this.rootName);
@@ -46,9 +47,73 @@ export default {
         updateEventTurn: function() {
             this.eventTurn = this.eventTurn ? false : true;
         },
+
         //logic function
         changeRoot(el, e) {
-            V(el).translate(~~e.movementX, ~~e.movementY); 
+            const vel = V(el);
+
+            if (e.type === "mousedown") {
+                // let contains = utils.findContainByName(el, this.rootName, true);
+                // let containsScale = contains.map(function(el) {
+                //     return utils.parseScaleString(el);
+                // });
+                // let originalScale = utils.parseScaleString(el);
+                // let nowScale = utils.calculateNowScale(originalScale, containsScale, true);
+
+                // vel.scale(nowScale.x, nowScale.y);
+                const originaldata = vel.bbox(true); 
+                const newdata = vel.bbox(false);
+
+                vel.scale((newdata.width)/originaldata.width, (newdata.height)/originaldata.height);
+
+                let position = vel.bbox();
+
+                vel.translate(~~position.x, ~~position.y, {absolute: true}); 
+                V(this.svg).append(vel);
+                
+  
+            }
+
+            if (e.type === "mousemove") {
+               vel.translate(~~e.movementX, ~~e.movementY); 
+            }
+
+            if (e.type === "mouseup") {
+               let allRoots = V(this.svg).find(utils.wrapNameSelector(this.rootName));
+               let nearRoot;
+               let min;
+
+               allRoots.forEach(function(root) {
+                   if (el.id !== root.node.id && utils.containsRect(root.bbox(), vel.bbox())) {
+                       let offset = vel.bbox().x - root.bbox().x;
+                       if (min !== void 0) {
+                           if (min > offset) {
+                               nearRoot = root.node;
+                               min = offset;
+                           }
+                       } else {
+                           nearRoot = root.node;
+                           min = offset;
+                       }
+                   }
+               });
+
+               if (nearRoot !== void 0) {
+                    let position = vel.bbox(false, nearRoot); 
+
+                    vel.translate(~~position.x, ~~position.y, {absolute: true}); 
+                    V(nearRoot).append(vel);
+
+                    let contains = utils.findContainByName(el, this.rootName, true);
+                    let containsScale = contains.map(function(el) {
+                        return utils.parseScaleString(el);
+                    });
+                    let originalScale = utils.parseScaleString(el);
+                    let nowScale = utils.calculateNowScale(originalScale, containsScale, false);
+
+                    vel.scale(nowScale.x, nowScale.y);
+               } 
+            }
         },
         linkRoot(el, e) {
             const dataSet = this.linkData;
@@ -109,13 +174,8 @@ export default {
 
         //event choose function
         chooseComponent: function(e) {
-            if (!!e.target.ownerSVGElement) {
-                this.component = utils.findParentByName(e.target, this.nameSet);
-                this.component ? this.method(this.component, e) : null;
-
-                //make choosed component on the top.
-                this.svg.appendChild(this.findRoot(this.component));
-            }
+            this.component = utils.findParentByName(e.target, this.nameSet);
+            this.component ? this.method(this.component, e) : null;
         },
         moveComponent: function(e) {
             this.component ? this.method(this.component, e) : null;
@@ -124,7 +184,7 @@ export default {
             this.component ? this.method(this.component, e) : null;
             this.component = undefined;
         },
-        
+
         //UX function 
         displayTool: function(e) {
             const root = this.findRoot(e.target);

@@ -1,5 +1,5 @@
 <script>
-import {findParentByName} from "../utils";
+import {findParentByName, findContainByName} from "../utils";
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { SET_SCALE_METHOD} from 'store/tool';
@@ -16,7 +16,7 @@ export default {
         scaleRoot(el, e) {
             const vel = V(findParentByName(el, this.rootName));
             const originaldata = vel.bbox(true); 
-            const newdata = vel.bbox();
+            const newdata = vel.bbox(false, findContainByName(el, this.rootName));
 
             vel.scale((newdata.width + e.movementX)/originaldata.width, (newdata.height + e.movementY)/originaldata.height);
         }

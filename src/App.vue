@@ -21,7 +21,7 @@ export default {
         <Sidebar class="L" itemX=".menu" itemY=".workspace" limit="15%"></Sidebar>
         <Palette class="Box workspace"></Palette>
         <Sidebar class="R" itemX=".workspace" itemY=".BoxC" limit="15%"></Sidebar>
-        <div class="Box BoxC">
+        <div class="Box code">
 
         </div>
     </div>
@@ -40,7 +40,6 @@ export default {
         }
         .workspace {
             width: 60%;
-            background-color: #21444D;
         }
         .L {
             left: 20%;

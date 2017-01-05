@@ -22,7 +22,7 @@ export default {
     .link {
         cursor: crosshair;
         opacity:0.8;
-        stroke:#93A1A1; 
+        stroke:#333333; 
         stroke-width: 3;
     }
 </style>
