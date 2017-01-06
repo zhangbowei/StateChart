@@ -108,8 +108,9 @@ export default {
 
         //watch&follow related pointed  changed 
         triggerWatchLink: function(el) {
-            this.eventTurn; 
-            return {x: V(this.findRoot(el)).bbox().x, y: V(this.findRoot(el)).bbox().y};
+            this.eventTurn;
+            const vel = V(this.findRoot(el));
+            return vel.bbox().x + vel.bbox().y;
         },
         watchLink: function(index) {
             const data = this.linkData[index];
@@ -165,6 +166,9 @@ export default {
         $(this.$el).droppable({
             accept: 'svg',
             drop: (e, ui) => {
+                //cleanup all id, to avoid repeat. 
+                utils.cleanRootAllId(ui.helper[0]);
+
                 const point = V(this.svg).toLocalPoint(ui.position.left, ui.position.top);
                 const vel = V(ui.helper[0].querySelector(utils.wrapNameSelector(this.rootName)));
 

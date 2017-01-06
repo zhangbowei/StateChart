@@ -233,9 +233,19 @@ function setToolDisplay(nodes, name, display) {
     if (!_.isArray(nodes)) {
         nodes = [nodes];
     }
-    nodes.forEach(function(el) {
-       el.querySelector(wrapNameSelector(name)).setAttribute('display', display); 
+    nodes.forEach(function(node) {
+       node.querySelector(wrapNameSelector(name)).setAttribute('display', display); 
     });
+}
+
+function cleanRootAllId(el) {
+    let nodes = [el];
+    let len  = nodes.length;
+    for (let i=0; i < len; i++) {
+        nodes[i].setAttribute('id', '');
+        nodes = nodes.concat(Array.prototype.slice.call(nodes[i].children));
+        len = nodes.length;
+    };
 }
 
 const utils = {
@@ -246,7 +256,8 @@ const utils = {
     curryIt,
     findNearContain,
     autoTransformTheRoot,
-    setToolDisplay
+    setToolDisplay,
+    cleanRootAllId
 };
 
 export default utils;

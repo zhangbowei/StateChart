@@ -118,3 +118,6 @@ return 返回值是否改变，决定了回调函数是否执行（const box....
 
 所以 return this.eventHappenedNum + this.root.... 会一直触发回调函数
 **
+
+##translateTheRoot实现嵌套
+el.children 就是nodelist结构（伪数组），可以直接Array.prototype.slice.call(el.children)转化过来。（不转化，遍历时自然length等用不到的属性也会出来）
