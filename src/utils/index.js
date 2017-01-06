@@ -26,35 +26,6 @@ export function findParentByName(el, nameSet) {
     return null;
 }
 
-export function findContainByName(el, nameSet, findAll) {
-
-    const NUM = 2;
-    const terminator = el.ownerSVGElement;
-    const contains = [];
-
-    if (_.isNull(terminator)) {
-        return null;
-    }
-
-    let num = 0;
-    while (el && el !== terminator) {
-
-        if (nameSet.indexOf(el.getAttribute('name')) !== -1) {
-            num++;
-            if (num >= NUM) {
-                contains.push(el);
-                if (!findAll) {
-                    break;
-                }
-            }
-        }
-
-        el = el.parentNode;
-    }
-
-    return findAll ? contains : contains[0];
-}
-
 export function makeMouseFirst(data, offset) {
     offset = Math.abs(offset) || 1;
     for (let item in data) {
@@ -85,7 +56,7 @@ export function curryIt(fn) {
     return func;
 }
 
-export function containsRect(r, nr) {
+function containsRect(r, nr) {
     const X = nr.x;
     const Y = nr.y;
     const x = r.x;
@@ -119,20 +90,71 @@ export function containsRect(r, nr) {
     return true;
 }
 
-export function parseScaleString(el) {
-    let transform = el.getAttribute('transform') || '';
+export function findNearContain(el, allRoots) {
+    const vel = V(el);
+    let min;
+    let nearContain;
+
+    allRoots.forEach(function(root) {
+        if (el.id !== root.node.id && containsRect(root.bbox(), vel.bbox())) {
+            let offset = vel.bbox().x - root.bbox().x;
+            if (min !== void 0) {
+                if (min > offset) {
+                    nearContain = root.node;
+                    min = offset;
+                }
+            } else {
+                nearContain = root.node;
+                min = offset;
+            }
+        }
+    });
+
+    return nearContain;
+}
+
+
+export function findContainsByName(el, nameSet) {
+
+    const NUM = 2;
+    const terminator = el.ownerSVGElement;
+    const contains = [];
+
+    if (_.isNull(terminator)) {
+        return null;
+    }
+
+    let num = 0;
+    while (el && el !== terminator) {
+
+        if (nameSet.indexOf(el.getAttribute('name')) !== -1) {
+            num++;
+            if (num >= NUM) {
+                contains.push(el);
+            }
+        }
+
+        el = el.parentNode;
+    }
+
+    return contains;
+}
+
+
+function parseScaleString(el) {
     let scale;
+    const transform = el.getAttribute('transform') || '';
 
     if (transform) {
-        var separator = /[ ,]+/;
-        var scaleMatch = transform.match(/scale\((.*)\)/);
+        const separator = /[ ,]+/;
+        const scaleMatch = transform.match(/scale\((.*)\)/);
 
         if (scaleMatch) {
             scale = scaleMatch[1].split(separator);
         }
     }
 
-    var sx = (scale && scale[0]) ? parseFloat(scale[0]) : 1;
+    const sx = (scale && scale[0]) ? parseFloat(scale[0]) : 1;
 
     return {
         x: sx,
@@ -140,7 +162,7 @@ export function parseScaleString(el) {
     };
 }
 
-export function calculateNowScale(originalScale, containsScale, returnPalette) {
+function calculateNowScale(originalScale, containsScale, returnPalette) {
     let nowScale = _.clone(originalScale);
 
     if (returnPalette) {
@@ -158,16 +180,63 @@ export function calculateNowScale(originalScale, containsScale, returnPalette) {
     return nowScale;
 }
 
+export function scaleTheRoot(el, contains, returnPalette) {
+    const vel = V(el);
+    const containsScale = contains.map(function(el) {
+        return parseScaleString(el);
+    });
+    const originalScale = parseScaleString(el);
+    const nowScale = calculateNowScale(originalScale, containsScale, returnPalette);
+
+    vel.scale(nowScale.x, nowScale.y);
+}
+
+function translateTheRoot(el, contains, returnPalette) {
+    const vel = V(el);
+    let scale;
+    let relativeTranslate;
+    let absoluteTranslate;
+
+    if (contains.length) {
+        scale = contains.map(function(el) {
+            return parseScaleString(el);
+        }).reduce(function(a, b) {
+            return { x: a.x * b.x, y: a.y * b.y };
+        });
+        relativeTranslate = vel.bbox(false, contains[0]);
+        absoluteTranslate = V(contains[0]).bbox();
+    } else {
+        scale = { x: 1, y: 1 };
+        relativeTranslate = vel.bbox();
+        absoluteTranslate = V(el.ownerSVGElement).bbox();
+    }
+
+    const nowTranslate = {};
+    if (returnPalette) {
+        nowTranslate.x = (relativeTranslate.x * scale.x) + absoluteTranslate.x;
+        nowTranslate.y = (relativeTranslate.y * scale.y) + absoluteTranslate.y;
+    } else {
+        nowTranslate.x = (relativeTranslate.x - absoluteTranslate.x) / scale.x;
+        nowTranslate.y = (relativeTranslate.y - absoluteTranslate.y) / scale.y;
+    }
+
+    vel.translate(nowTranslate.x, nowTranslate.y, { absolute: true });
+}
+
+function autoTransformTheRoot(el, name, returnPlatte) {
+    const contains = findContainsByName(el, name);
+    scaleTheRoot(el, contains, returnPlatte);
+    translateTheRoot(el, contains, returnPlatte);
+}
+
 const utils = {
     wrapNameSelector,
     findParentByName,
-    findContainByName,
     makeMouseFirst,
     addEventListener,
     curryIt,
-    containsRect,
-    parseScaleString,
-    calculateNowScale
+    findNearContain,
+    autoTransformTheRoot
 };
 
 export default utils;

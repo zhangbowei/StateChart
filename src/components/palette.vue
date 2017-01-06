@@ -53,25 +53,12 @@ export default {
             const vel = V(el);
 
             if (e.type === "mousedown") {
-                // let contains = utils.findContainByName(el, this.rootName, true);
-                // let containsScale = contains.map(function(el) {
-                //     return utils.parseScaleString(el);
-                // });
-                // let originalScale = utils.parseScaleString(el);
-                // let nowScale = utils.calculateNowScale(originalScale, containsScale, true);
+                //protect .bbox() is pure x,y,width,height (toolbox should be hidden)
+                el.querySelector(utils.wrapNameSelector(this.boxName)).setAttribute('display', 'none');
+                el.parentNode.querySelector(utils.wrapNameSelector(this.boxName)).setAttribute('display', 'none');
 
-                // vel.scale(nowScale.x, nowScale.y);
-                const originaldata = vel.bbox(true); 
-                const newdata = vel.bbox(false);
-
-                vel.scale((newdata.width)/originaldata.width, (newdata.height)/originaldata.height);
-
-                let position = vel.bbox();
-
-                vel.translate(~~position.x, ~~position.y, {absolute: true}); 
+                utils.autoTransformTheRoot(el, this.rootName, true); 
                 V(this.svg).append(vel);
-                
-  
             }
 
             if (e.type === "mousemove") {
@@ -80,38 +67,11 @@ export default {
 
             if (e.type === "mouseup") {
                let allRoots = V(this.svg).find(utils.wrapNameSelector(this.rootName));
-               let nearRoot;
-               let min;
+               let nearContain = utils.findNearContain(el, allRoots);
 
-               allRoots.forEach(function(root) {
-                   if (el.id !== root.node.id && utils.containsRect(root.bbox(), vel.bbox())) {
-                       let offset = vel.bbox().x - root.bbox().x;
-                       if (min !== void 0) {
-                           if (min > offset) {
-                               nearRoot = root.node;
-                               min = offset;
-                           }
-                       } else {
-                           nearRoot = root.node;
-                           min = offset;
-                       }
-                   }
-               });
-
-               if (nearRoot !== void 0) {
-                    let position = vel.bbox(false, nearRoot); 
-
-                    vel.translate(~~position.x, ~~position.y, {absolute: true}); 
-                    V(nearRoot).append(vel);
-
-                    let contains = utils.findContainByName(el, this.rootName, true);
-                    let containsScale = contains.map(function(el) {
-                        return utils.parseScaleString(el);
-                    });
-                    let originalScale = utils.parseScaleString(el);
-                    let nowScale = utils.calculateNowScale(originalScale, containsScale, false);
-
-                    vel.scale(nowScale.x, nowScale.y);
+               if (nearContain) {
+                    V(nearContain).append(vel);
+                    utils.autoTransformTheRoot(el, this.rootName, false); 
                } 
             }
         },

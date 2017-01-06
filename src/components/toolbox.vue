@@ -1,5 +1,5 @@
 <script>
-import {findParentByName, findContainByName} from "../utils";
+import {findParentByName, findContainsByName, scaleTheRoot} from "../utils";
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { SET_SCALE_METHOD} from 'store/tool';
@@ -16,9 +16,12 @@ export default {
         scaleRoot(el, e) {
             const vel = V(findParentByName(el, this.rootName));
             const originaldata = vel.bbox(true); 
-            const newdata = vel.bbox(false, findContainByName(el, this.rootName));
+            const newdata = vel.bbox();
+            const originalScale = {x: (newdata.width + e.movementX)/originaldata.width, y: (newdata.height + e.movementY)/originaldata.height};
+            vel.scale(originalScale.x, originalScale.y);
 
-            vel.scale((newdata.width + e.movementX)/originaldata.width, (newdata.height + e.movementY)/originaldata.height);
+            const contains = findContainsByName(el, this.rootName);
+            scaleTheRoot(vel.node, contains, false);
         }
     },
     created: function() {
