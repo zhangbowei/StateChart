@@ -229,6 +229,15 @@ function autoTransformTheRoot(el, name, returnPlatte) {
     translateTheRoot(el, contains, returnPlatte);
 }
 
+function setToolDisplay(nodes, name, display) {
+    if (!_.isArray(nodes)) {
+        nodes = [nodes];
+    }
+    nodes.forEach(function(el) {
+       el.querySelector(wrapNameSelector(name)).setAttribute('display', display); 
+    });
+}
+
 const utils = {
     wrapNameSelector,
     findParentByName,
@@ -236,7 +245,8 @@ const utils = {
     addEventListener,
     curryIt,
     findNearContain,
-    autoTransformTheRoot
+    autoTransformTheRoot,
+    setToolDisplay
 };
 
 export default utils;

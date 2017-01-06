@@ -12,6 +12,7 @@ export default {
             //this component: choosed component to do its logic function by "click and move"
             component: undefined,
             svg: undefined,
+            gStates: undefined,
             //link
             linkData: [],
             eventTurn: true
@@ -54,11 +55,10 @@ export default {
 
             if (e.type === "mousedown") {
                 //protect .bbox() is pure x,y,width,height (toolbox should be hidden)
-                el.querySelector(utils.wrapNameSelector(this.boxName)).setAttribute('display', 'none');
-                el.parentNode.querySelector(utils.wrapNameSelector(this.boxName)).setAttribute('display', 'none');
-
+                utils.setToolDisplay([el, el.parentNode], this.boxName, 'none');
                 utils.autoTransformTheRoot(el, this.rootName, true); 
-                V(this.svg).append(vel);
+
+                V(this.gStates).append(vel);
             }
 
             if (e.type === "mousemove") {
@@ -68,39 +68,36 @@ export default {
             if (e.type === "mouseup") {
                let allRoots = V(this.svg).find(utils.wrapNameSelector(this.rootName));
                let nearContain = utils.findNearContain(el, allRoots);
-
                if (nearContain) {
                     V(nearContain).append(vel);
                     utils.autoTransformTheRoot(el, this.rootName, false); 
                } 
+
+               utils.setToolDisplay(el, this.boxName, 'block');
             }
         },
         linkRoot(el, e) {
             const dataSet = this.linkData;
             const endIndex = dataSet.length-1;
+            const start = {}, end = {};
             
             if (e.type === "mousedown") {
-                let box = V(el).bbox();
-                let start = {x: box.x, y: box.y, id: el.id};
-                let end = utils.makeMouseFirst({x: e.offsetX, y: e.offsetY});
-
+                _.extend(start, _.pick(V(el).bbox(), 'x', 'y'), {id: el.id});
+                _.extend(end, utils.makeMouseFirst({x: e.offsetX, y: e.offsetY}), {id: undefined});
                 dataSet.push({start, end}); 
             } 
 
             if (e.type === "mousemove") {
-                let end = utils.makeMouseFirst({x: e.offsetX, y: e.offsetY}, 5);
-                dataSet[endIndex].end = end;
+                _.extend(end, utils.makeMouseFirst({x: e.offsetX, y: e.offsetY}, 5));
+                _.extend(dataSet[endIndex].end, end);
             }
 
             if (e.type === "mouseup") {
                 let endEl = utils.findParentByName(e.target, this.linkName);
 
                 if(!!endEl && dataSet[endIndex].start.id != endEl.id) {
-                    let box = V(endEl).bbox();
-                    let end = {x: box.x, y: box.y, id: endEl.id};
-                    dataSet[endIndex].end = end;
-                    dataSet[endIndex].startEl = el;
-                    dataSet[endIndex].endEl = endEl;
+                    _.extend(end, _.pick(V(endEl).bbox(), 'x', 'y'), {id: endEl.id});
+                    _.extend(dataSet[endIndex], {end, el, endEl})
                     
                     this.watchLink(endIndex);
                 } else {
@@ -112,23 +109,21 @@ export default {
         //watch&follow related pointed  changed 
         triggerWatchLink: function(el) {
             this.eventTurn; 
-            return this.findRoot(el).attributes.transform.value;
+            return {x: V(this.findRoot(el)).bbox().x, y: V(this.findRoot(el)).bbox().y};
         },
         watchLink: function(index) {
             const data = this.linkData[index];
-            const watchPointStart = utils.curryIt(this.triggerWatchLink)(data.startEl);
+            const watchPointStart = utils.curryIt(this.triggerWatchLink)(data.el);
             const watchPointEnd = utils.curryIt(this.triggerWatchLink)(data.endEl);
 
             this.$watch(watchPointStart, function() {
-                const box = V(data.startEl).bbox();
-                data.start.x = box.x;
-                data.start.y = box.y;
+                const box = _.pick(V(data.el).bbox(), 'x', 'y');
+                _.extend(data.start, box);
             });
 
             this.$watch(watchPointEnd, function() {
-                const box = V(data.endEl).bbox();
-                data.end.x = box.x;
-                data.end.y = box.y;
+                const box = _.pick(V(data.endEl).bbox(), 'x', 'y');
+                _.extend(data.end, box);
             });
         },
 
@@ -149,13 +144,13 @@ export default {
         displayTool: function(e) {
             const root = this.findRoot(e.target);
             if (!!root) {
-                root.querySelector(utils.wrapNameSelector(this.boxName)).setAttribute('display', 'block'); 
+                utils.setToolDisplay(root, this.boxName, "block");
             } 
         },
         hideTool: function(e) {
             const root = this.findRoot(e.target);
             if (!!root) {
-                root.querySelector(utils.wrapNameSelector(this.boxName)).setAttribute('display', 'none');
+                utils.setToolDisplay(root, this.boxName, "none");
             }
         }
     },
@@ -165,6 +160,7 @@ export default {
     },
     mounted() {
         this.svg = this.$el.querySelector('svg');
+        this.gStates = this.svg.querySelector('g');
 
         $(this.$el).droppable({
             accept: 'svg',
@@ -174,7 +170,7 @@ export default {
 
                 vel.translate(~~point.x, ~~point.y);
                 vel.node.querySelector(utils.wrapNameSelector(this.boxName)).setAttribute('display', 'block');
-                this.svg.appendChild(vel.node);
+                this.gStates.appendChild(vel.node);
             }
         });
 
@@ -187,7 +183,10 @@ export default {
     <div>
         <svg class="sketch" @mousemove="moveComponent" @mouseup="removeComponent" @mousedown="chooseComponent" @mouseover="displayTool"
             @mouseout="hideTool">
-            <PointLink v-for="item in linkData" :data="item"></PointLink>
+            <g></g>
+            <g>
+                <PointLink v-for="item in linkData" :data="item"></PointLink>
+            </g>
         </svg>
     </div>
 </template>
