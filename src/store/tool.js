@@ -6,21 +6,25 @@ const store = {
     state: {
         root: {
             name: 'root',
-            method: undefined
+            method: () => {} 
         },
         scale: {
             name: 'scale',
-            method: undefined
+            method: () => {} 
             
         },
         box: {
             name: 'box',
-            method: undefined
+            method: () => {} 
             
         },
         link: {
             name: 'link',
-            method: undefined
+            method: () => {} 
+        },
+        sign: {
+            name: 'sign',
+            method: () => {} 
         }
     },
     mutations: {

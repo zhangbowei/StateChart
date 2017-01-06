@@ -230,6 +230,9 @@ function autoTransformTheRoot(el, name, returnPlatte) {
 }
 
 function setToolDisplay(nodes, name, display) {
+    if (!nodes) {
+        return null;
+    }
     if (!_.isArray(nodes)) {
         nodes = [nodes];
     }

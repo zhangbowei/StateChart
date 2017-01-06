@@ -9,7 +9,8 @@ export default {
         scaleName: state => state.tool.scale.name,
         linkName: state => state.tool.link.name,
         boxName: state => state.tool.box.name,
-        rootName: state => state.tool.root.name
+        rootName: state => state.tool.root.name,
+        signName: state => state.tool.sign.name
     }),
     methods: {
         ...mapActions([SET_SCALE_METHOD]),
@@ -32,6 +33,7 @@ export default {
 
 <template>
     <g :name="boxName">
+        <circle class="sign" :name="signName"></circle>
         <circle class="scale" :name="scaleName"></circle>
         <circle class="link" :name="linkName"></circle>
         <circle class="link" :name="linkName"></circle>
@@ -41,6 +43,12 @@ export default {
 </template>
 
 <style scoped lang="less">
+    .sign {
+        cursor: se-resize;
+        opacity: 0.8;
+        fill: #319A8B;
+        r: 6;
+    }
     .scale {
         cursor: se-resize;
         opacity:0.0;

@@ -9,13 +9,15 @@ export default {
     components: { PointLink},
     data() {
         return {
-            //this component: choosed component to do its logic function by "click and move"
-            component: undefined,
             svg: undefined,
             gStates: undefined,
+            eventTurn: true,
             //link
             linkData: [],
-            eventTurn: true
+            //this component: choosed component to do its logic function by "click and move"
+            component: undefined,
+            //this focus: choosed to mark what state has been choosed to code.
+            focus: undefined
         }
     },
     computed: mapState({
@@ -36,7 +38,8 @@ export default {
         },
         boxName: state => state.tool.box.name,
         linkName: state => state.tool.link.name,
-        rootName: state => state.tool.root.name
+        rootName: state => state.tool.root.name,
+        signName: state => state.tool.sign.name
     }),
     methods: {
         ...mapActions([SET_ROOT_METHOD, SET_LINK_METHOD]),
@@ -144,15 +147,20 @@ export default {
         //UX function 
         displayTool: function(e) {
             const root = this.findRoot(e.target);
-            if (!!root) {
-                utils.setToolDisplay(root, this.boxName, "block");
-            } 
+            utils.setToolDisplay(root, this.boxName, "block");
         },
         hideTool: function(e) {
             const root = this.findRoot(e.target);
-            if (!!root) {
-                utils.setToolDisplay(root, this.boxName, "none");
+            utils.setToolDisplay(root, this.boxName, "none");
+        },
+        //
+        produceCode: function(e) {
+            const root = utils.findParentByName(e.target, this.rootName);
+            utils.setToolDisplay(root, this.signName, "block"); 
+            if (this.focus !== this.root) {
+                utils.setToolDisplay(this.focus, this.signName, "none"); 
             }
+            this.focus = root;            
         }
     },
     created: function() {
@@ -173,7 +181,8 @@ export default {
                 const vel = V(ui.helper[0].querySelector(utils.wrapNameSelector(this.rootName)));
 
                 vel.translate(~~point.x, ~~point.y);
-                vel.node.querySelector(utils.wrapNameSelector(this.boxName)).setAttribute('display', 'block');
+                utils.setToolDisplay(vel.node, this.signName, "none"); 
+                utils.setToolDisplay(vel.node, this.boxName, "block"); 
                 this.gStates.appendChild(vel.node);
             }
         });
@@ -186,7 +195,7 @@ export default {
 <template>
     <div>
         <svg class="sketch" @mousemove="moveComponent" @mouseup="removeComponent" @mousedown="chooseComponent" @mouseover="displayTool"
-            @mouseout="hideTool">
+            @mouseout="hideTool" @dblclick="produceCode">
             <g></g>
             <g>
                 <PointLink v-for="item in linkData" :data="item"></PointLink>
