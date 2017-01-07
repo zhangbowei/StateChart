@@ -128,10 +128,11 @@ el.children 就是nodelist结构（伪数组），可以直接Array.prototype.sl
 
 **字符对不上原因出在，我用prism官网的css替换了 codepen 上人家本身的配色方案。
 
-![](photos/prism1.png)
-![](photos/prism2.png)
+<img src="./photos/prism1.png" width = "200" height = "200" alt="图片名称" align=center />
+<img src="./photos/prism2.png" width = "200" height = "200" alt="图片名称" align=center />
 
 > 最后，通过注释掉了官网css中的一句话，避免了字符错位。（没有用codepen原本的less文件)
 
-![](photos/prism3.png)
-![](photos/prism4.png)
+<img src="./photos/prism3.png" width = "200" height = "300" alt="图片名称" align=center />
+<img src="./photos/prism4.png" width = "200" height = "300" alt="图片名称" align=center />
+
