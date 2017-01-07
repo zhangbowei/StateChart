@@ -1,5 +1,5 @@
 <script>
-import 'vendor/prism.less';
+import 'vendor/prism.css';
 import Prism from "vendor/prism";
 
 var MicroCode = (function(){
