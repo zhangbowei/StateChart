@@ -7,13 +7,16 @@ export default {
             const start = this.data.start;
             const end = this.data.end;
             return ['M', start.x, start.y, 'L', end.x, end.y].join(' ');
+        },
+        id: function() {
+            return [this.data.start.id, this.data.end.id].join(' ');
         }
     }
 };
 </script>
 
 <template>
-    <path class="link" :d="pathD"></path>
+    <path :id="id" class="link" :d="pathD"></path>
 </template>
 
 <style scoped lang="less">

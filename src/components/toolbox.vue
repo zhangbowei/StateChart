@@ -46,8 +46,11 @@ export default {
     .sign {
         cursor: se-resize;
         opacity: 0.8;
-        fill: #319A8B;
-        r: 6;
+        fill: #6ED44E;
+        r: 5;
+        stroke:#319A8B;
+        stroke-width: 3;
+        stroke-opacity: 0.4;
     }
     .scale {
         cursor: se-resize;

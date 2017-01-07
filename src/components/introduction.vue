@@ -1,4 +1,5 @@
 <script>
+import 'vendor/entypo.css';
 export default {
     props: ['content'], 
 };

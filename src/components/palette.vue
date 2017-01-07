@@ -60,7 +60,6 @@ export default {
                 //protect .bbox() is pure x,y,width,height (toolbox should be hidden)
                 utils.setToolDisplay([el, el.parentNode], this.boxName, 'none');
                 utils.autoTransformTheRoot(el, this.rootName, true); 
-
                 V(this.gStates).append(vel);
             }
 
@@ -75,7 +74,6 @@ export default {
                     V(nearContain).append(vel);
                     utils.autoTransformTheRoot(el, this.rootName, false); 
                } 
-
                utils.setToolDisplay(el, this.boxName, 'block');
             }
         },
@@ -100,7 +98,7 @@ export default {
 
                 if(!!endEl && dataSet[endIndex].start.id != endEl.id) {
                     _.extend(end, _.pick(V(endEl).bbox(), 'x', 'y'), {id: endEl.id});
-                    _.extend(dataSet[endIndex], {end, el, endEl})
+                    _.extend(dataSet[endIndex], {end, el, endEl});
                     
                     this.watchLink(endIndex);
                 } else {
@@ -154,13 +152,12 @@ export default {
             utils.setToolDisplay(root, this.boxName, "none");
         },
         //
-        produceCode: function(e) {
-            const root = utils.findParentByName(e.target, this.rootName);
-            utils.setToolDisplay(root, this.signName, "block"); 
-            if (this.focus !== this.root) {
+        displayCodeEditor: function(el) {
+            utils.setToolDisplay(el, this.signName, "block"); 
+            if (this.focus !== el) {
                 utils.setToolDisplay(this.focus, this.signName, "none"); 
             }
-            this.focus = root;            
+            this.focus = el;            
         }
     },
     created: function() {
@@ -195,7 +192,7 @@ export default {
 <template>
     <div>
         <svg class="sketch" @mousemove="moveComponent" @mouseup="removeComponent" @mousedown="chooseComponent" @mouseover="displayTool"
-            @mouseout="hideTool" @dblclick="produceCode">
+            @mouseout="hideTool">
             <g></g>
             <g>
                 <PointLink v-for="item in linkData" :data="item"></PointLink>

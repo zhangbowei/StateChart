@@ -121,3 +121,13 @@ return 返回值是否改变，决定了回调函数是否执行（const box....
 
 ##translateTheRoot实现嵌套
 el.children 就是nodelist结构（伪数组），可以直接Array.prototype.slice.call(el.children)转化过来。（不转化，遍历时自然length等用不到的属性也会出来）
+
+##prism 三方库使用 出现的问题
+使用<style scoped>，必须在当前文件内将 dom树（<template></template>）写好。
+
+<style scoped>形成的'css规则树'只在 当前元素生成 渲染树时有用，即便之后创建元素后挂载在<template></template>根元素中，<style scoped>的css也不起作用。
+
+**字符对不上原因出在，我用prism官网的css替换了 codepen 上人家本身的配色方案。
+
+![](photos/prism1.png)
+![](photos/prism2.png)

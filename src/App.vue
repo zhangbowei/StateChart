@@ -3,9 +3,10 @@ import Sidebar from 'components/sidebar';
 import Search from 'components/Search';
 import List from 'components/List';
 import Palette from 'components/palette';
+import CodeEditor from 'components/CodeEditor';
 
 export default {
-    components: { Sidebar, Search, List, Palette},
+    components: { Sidebar, Search, List, Palette, CodeEditor},
     directives: {
 
     }
@@ -18,11 +19,11 @@ export default {
             <Search></Search>
             <List></List>
         </div>
-        <Sidebar class="L" itemX=".menu" itemY=".workspace" limit="15%"></Sidebar>
+        <Sidebar class="L" itemX=".menu" itemY=".workspace" limit="10%"></Sidebar>
         <Palette class="Box workspace"></Palette>
-        <Sidebar class="R" itemX=".workspace" itemY=".BoxC" limit="15%"></Sidebar>
+        <Sidebar class="R" itemX=".workspace" itemY=".code" limit="10%"></Sidebar>
         <div class="Box code">
-
+            <CodeEditor></CodeEditor>
         </div>
     </div>
 </template>
