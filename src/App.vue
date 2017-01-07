@@ -19,9 +19,9 @@ export default {
             <Search></Search>
             <List></List>
         </div>
-        <Sidebar class="L" itemX=".menu" itemY=".workspace" limit="10%"></Sidebar>
+        <Sidebar class="L" itemX=".menu" itemY=".workspace" limit="15%"></Sidebar>
         <Palette class="Box workspace"></Palette>
-        <Sidebar class="R" itemX=".workspace" itemY=".code" limit="10%"></Sidebar>
+        <Sidebar class="R" itemX=".workspace" itemY=".code" limit="8%"></Sidebar>
         <div class="Box code">
             <CodeEditor></CodeEditor>
         </div>
