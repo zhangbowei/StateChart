@@ -38,7 +38,7 @@ SVG 适合于直接 px 布局，结合 scalable;
 
 svg 默认 类似于 inline-block; 但是若想和他一行，应该使用float(如果使用inline-block, 会有高度差)
 
-![](./photos/svg1.png)
+![](photos/svg1.png)
 
 
 SVG的g/内部标签不支持
@@ -122,16 +122,16 @@ return 返回值是否改变，决定了回调函数是否执行（const box....
 ##translateTheRoot实现嵌套
 el.children 就是nodelist结构（伪数组），可以直接Array.prototype.slice.call(el.children)转化过来。（不转化，遍历时自然length等用不到的属性也会出来）
 ##prism 三方库使用 出现的问题
-使用<style scoped>，必须在当前文件内将 dom树（<template></template>）写好。
+使用`<style scoped>`，必须在当前文件内将 dom树（`<template></template>`）写好。
 
-<style scoped>形成的'css规则树'只在 当前元素生成 渲染树时有用，即便之后创建元素后挂载在<template></template>根元素中，<style scoped>的css也不起作用。
+`<style scoped>`形成的'css规则树'只在 当前元素生成 渲染树时有用，即便之后创建元素后挂载在`<template></template>`根元素中，`<style scoped>`的css也不起作用。
 
 **字符对不上原因出在，我用prism官网的css替换了 codepen 上人家本身的配色方案。
 
-![](./photos/prism1.png)
-![](./photos/prism2.png)
+![](photos/prism1.png)
+![](photos/prism2.png)
 
 > 最后，通过注释掉了官网css中的一句话，避免了字符错位。（没有用codepen原本的less文件)
 
-![](./photos/prism3.png)
-![](./photos/prism4.png)
+![](photos/prism3.png)
+![](photos/prism4.png)
