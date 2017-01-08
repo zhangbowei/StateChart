@@ -30,7 +30,7 @@ export default {
             <rect class="background"></rect>
             <path class="separator" d="M0,15 L60,15"></path>
             <text class="name">
-                <tspan>State</tspan>
+                <tspan>Region</tspan>
             </text>
             <text class="event">
                 <tspan dy="0em"></tspan>
