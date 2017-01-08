@@ -3,6 +3,7 @@ import utils from "../utils";
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { SET_ROOT_METHOD, SET_LINK_METHOD} from 'store/tool';
+import { SET_CODE_KEY} from 'store/code';
 import PointLink from './pointLink';
 
 export default {
@@ -16,8 +17,6 @@ export default {
             linkData: [],
             //this component: choosed component to do its logic function by "click and move"
             component: undefined,
-            //this focus: choosed to mark what state has been choosed to code.
-            focus: undefined
         }
     },
     computed: mapState({
@@ -39,19 +38,12 @@ export default {
         boxName: state => state.tool.box.name,
         linkName: state => state.tool.link.name,
         rootName: state => state.tool.root.name,
-        signName: state => state.tool.sign.name
+        signName: state => state.tool.sign.name,
+        transitionName: state => state.tool.transition.name
     }),
     methods: {
-        ...mapActions([SET_ROOT_METHOD, SET_LINK_METHOD]),
+        ...mapActions([SET_ROOT_METHOD, SET_LINK_METHOD, SET_CODE_KEY]),
         
-        //get Variables
-        findRoot: function(el) {
-            return utils.findParentByName(el, this.rootName);
-        },
-        updateEventTurn: function() {
-            this.eventTurn = this.eventTurn ? false : true;
-        },
-
         //logic function
         changeRoot(el, e) {
             const vel = V(el);
@@ -108,11 +100,16 @@ export default {
         },
 
         //watch&follow related pointed  changed 
+        updateEventTurn: function() {
+            this.eventTurn = this.eventTurn ? false : true;
+        },
+
         triggerWatchLink: function(el) {
             this.eventTurn;
-            const vel = V(this.findRoot(el));
+            const vel = V(utils.findParentByName(el, this.rootName));
             return vel.bbox().x + vel.bbox().y;
         },
+
         watchLink: function(index) {
             const data = this.linkData[index];
             const watchPointStart = utils.curryIt(this.triggerWatchLink)(data.el);
@@ -133,6 +130,10 @@ export default {
         chooseComponent: function(e) {
             this.component = utils.findParentByName(e.target, this.nameSet);
             this.component ? this.method(this.component, e) : null;
+
+            //send data to codeEditor
+            const item = utils.findParentByName(e.target, [this.transitionName, this.rootName]);
+            this[SET_CODE_KEY](item ? item.id : null);
         },
         moveComponent: function(e) {
             this.component ? this.method(this.component, e) : null;
@@ -144,20 +145,12 @@ export default {
 
         //UX function 
         displayTool: function(e) {
-            const root = this.findRoot(e.target);
+            const root = utils.findParentByName(e.target, this.rootName);
             utils.setToolDisplay(root, this.boxName, "block");
         },
         hideTool: function(e) {
-            const root = this.findRoot(e.target);
+            const root = utils.findParentByName(e.target, this.rootName);
             utils.setToolDisplay(root, this.boxName, "none");
-        },
-        //
-        displayCodeEditor: function(el) {
-            utils.setToolDisplay(el, this.signName, "block"); 
-            if (this.focus !== el) {
-                utils.setToolDisplay(this.focus, this.signName, "none"); 
-            }
-            this.focus = el;            
         }
     },
     created: function() {

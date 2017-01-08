@@ -1,6 +1,10 @@
 <script>
 import 'vendor/prism.css';
 import Prism from "vendor/prism";
+import {setToolDisplay, wrapIdSelector} from "../utils";
+import { mapState } from 'vuex';
+import { mapActions } from 'vuex';
+import { ADD_CODE_DATA, UPDATE_CODE_DATA} from 'store/code';
 
 var MicroCode = (function(){
 	return {
@@ -82,6 +86,50 @@ var MicroCode = (function(){
 })();
 
 export default {
+    data() {
+        return {
+            component: undefined
+        }
+    },
+    computed: mapState({
+        data: function(state) {
+            let result;
+
+            for(let i in state.code.datasets) {
+                if (state.code.datasets[i].id === state.code.filterKey) {
+                    result = state.code.datasets[i];
+                }
+            }
+
+            if (!result) {
+                this.component = document.querySelector(wrapIdSelector(state.code.filterKey));
+                result = {id: this.component.id, name: this.component.getAttribute('name'), code: '1'};
+                this[ADD_CODE_DATA](result);
+            } else {
+                this.component = result.id ? document.querySelector(wrapIdSelector(result.id)) : undefined;
+            }
+
+            return result;
+        },
+        
+        boxName: state => state.tool.box.name,
+        signName: state => state.tool.sign.name
+    }),
+    methods: {
+        ...mapActions([ADD_CODE_DATA, UPDATE_CODE_DATA]),
+        displayState() {
+            if (this.component) {
+                setToolDisplay(this.component, this.boxName, 'block');
+                setToolDisplay(this.component, this.signName, 'block');
+            }
+        },
+        hideState() {
+            if (this.component) {
+                setToolDisplay(this.component, this.boxName, 'none');
+                setToolDisplay(this.component, this.signName, 'none');
+            }
+        }
+    },
     mounted() {
         MicroCode.init('.code-input', '.code-output', '.language');
     }
@@ -89,20 +137,18 @@ export default {
 </script>
 
 <template>
-    <main class="view">
+    <main class="view" @mouseover="displayState" @mouseout="hideState">
         <h1 class="title"></h1>
 
         <div class="window">
             <div class="window-header">
                 <div class="action-buttons"></div>
                 <select class="language">
-				<option value="javascript" selected>JavaScript</option>
-				<option value="markup">HTML</option>
-				<option value="php">PHP</option>
+				<option value="JavaScript" selected>{{data.name}}</option>
 			</select>
             </div>
             <div class="window-body">
-                <textarea class="code-input">// Switch the language and put some code on me :)           ↑↑↑↑↑↑</textarea>
+                <textarea class="code-input">{{data.code}}</textarea>
                 <pre class="code-output">
                     <code class="language-javascript"></code>
                 </pre>
@@ -118,7 +164,6 @@ export default {
     @color-1st: LightCoral;
     @color-2nd: GhostWhite;
     @color-3rd: Gainsboro;
-
     *:focus {
         outline: none;
     }

@@ -6,6 +6,10 @@ export function wrapNameSelector(name) {
     return ['[name=', name, ']'].join('');
 }
 
+export function wrapIdSelector(id) {
+    return ['#', id].join('');
+}
+
 export function findParentByName(el, nameSet) {
 
     const terminator = el.ownerSVGElement;
@@ -229,7 +233,7 @@ function autoTransformTheRoot(el, name, returnPlatte) {
     translateTheRoot(el, contains, returnPlatte);
 }
 
-function setToolDisplay(nodes, name, display) {
+export function setToolDisplay(nodes, name, display) {
     if (!nodes) {
         return null;
     }
@@ -237,7 +241,10 @@ function setToolDisplay(nodes, name, display) {
         nodes = [nodes];
     }
     nodes.forEach(function(node) {
-       node.querySelector(wrapNameSelector(name)).setAttribute('display', display); 
+       let el = node.querySelector(wrapNameSelector(name));
+       if (el) {
+           el.setAttribute('display', display); 
+       }
     });
 }
 

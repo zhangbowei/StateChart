@@ -136,3 +136,7 @@ el.children 就是nodelist结构（伪数组），可以直接Array.prototype.sl
 <img src="./photos/prism3.png" width = "200" height = "300" alt="图片名称" align=center />
 <img src="./photos/prism4.png" width = "200" height = "300" alt="图片名称" align=center />
 
+##选择器
+'#v-26&v-27' is not a valid selector.
+'#v-26>v-27' is not a valid selector.
+'#v-26-v-27' is a valid selector.

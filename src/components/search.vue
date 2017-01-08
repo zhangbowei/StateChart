@@ -1,12 +1,12 @@
 <script>
 import { mapActions } from 'vuex';
-import { SET_FILTER_KEY } from 'store/card';
+import { SET_CARD_KEY } from 'store/card';
 
 export default {
     methods: {
-        ...mapActions([SET_FILTER_KEY]),
+        ...mapActions([SET_CARD_KEY]),
         onKeyup(e) {
-            this[SET_FILTER_KEY](e.target.value);
+            this[SET_CARD_KEY](e.target.value);
         }
     }
 }

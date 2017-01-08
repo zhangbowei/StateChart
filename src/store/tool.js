@@ -25,6 +25,10 @@ const store = {
         sign: {
             name: 'sign',
             method: () => {} 
+        },
+        transition: {
+            name: 'transition',
+            method: () => {} 
         }
     },
     mutations: {

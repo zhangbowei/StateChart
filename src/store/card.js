@@ -1,4 +1,4 @@
-export const SET_FILTER_KEY = 'SET_FILTER_KEY' //登录成功
+export const SET_CARD_KEY = 'SET_CARD_KEY' //登录成功
 
 const now = new Date();
 const store = {
@@ -30,13 +30,13 @@ const store = {
         filterKey: ''
     },
     mutations: {
-        [SET_FILTER_KEY](state, value) {
+        [SET_CARD_KEY](state, value) {
             state.filterKey = value;
         }
     },
     actions: {
-        [SET_FILTER_KEY]({commit}, value) {
-            commit(SET_FILTER_KEY, value);
+        [SET_CARD_KEY]({commit}, value) {
+            commit(SET_CARD_KEY, value);
         }
     }
 };
