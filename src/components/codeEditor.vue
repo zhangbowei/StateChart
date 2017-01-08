@@ -88,7 +88,8 @@ var MicroCode = (function(){
 export default {
     data() {
         return {
-            component: undefined
+            component: undefined,
+            cleanEditor: false
         }
     },
     computed: mapState({
@@ -103,20 +104,26 @@ export default {
 
             if (!result) {
                 this.component = document.querySelector(wrapIdSelector(state.code.filterKey));
-                result = {id: this.component.id, name: this.component.getAttribute('name'), code: '1'};
+                result = {id: this.component.id, name: this.component.getAttribute('name'), code: 'function() {}'};
                 this[ADD_CODE_DATA](result);
             } else {
                 this.component = result.id ? document.querySelector(wrapIdSelector(result.id)) : undefined;
             }
-
+            
             return result;
         },
-        
         boxName: state => state.tool.box.name,
         signName: state => state.tool.sign.name
     }),
     methods: {
         ...mapActions([ADD_CODE_DATA, UPDATE_CODE_DATA]),
+        initCode() {
+            this.cleanEditor = true;
+            return this.data.code;
+        },
+        updataCode(value) {
+            this[UPDATE_CODE_DATA]({id: this.data.id, code: value});
+        },
         displayState() {
             if (this.component) {
                 setToolDisplay(this.component, this.boxName, 'block');
@@ -132,6 +139,11 @@ export default {
     },
     mounted() {
         MicroCode.init('.code-input', '.code-output', '.language');
+    },
+    updated() {
+        if (this.cleanEditor) {
+           $(this.$el).find('.code-input').keydown();
+        }
     }
 };
 </script>
@@ -148,7 +160,7 @@ export default {
 			</select>
             </div>
             <div class="window-body">
-                <textarea class="code-input">{{data.code}}</textarea>
+                <textarea class="code-input" :value="initCode()" @input="updataCode($event.target.value)"></textarea>
                 <pre class="code-output">
                     <code class="language-javascript"></code>
                 </pre>

@@ -25,7 +25,7 @@ const store = {
         [UPDATE_CODE_DATA](state, value) {
             for(let i in state.datasets) {
                 if (state.datasets[i].id === value.id) {
-                    _.extend(state.datasets[i], _.pick(value, 'name', 'code'));
+                    _.extend(state.datasets[i], _.pick(value, 'code'));
                     break;
                 }
             }

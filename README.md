@@ -140,3 +140,31 @@ el.children 就是nodelist结构（伪数组），可以直接Array.prototype.sl
 '#v-26&v-27' is not a valid selector.
 '#v-26>v-27' is not a valid selector.
 '#v-26-v-27' is a valid selector.
+
+##mapState
+```
+mapState({
+        data: function(state) {
+```
+vue的mapState是和 state.code.filterKey绑定的
+```
+for(let i in state.code.datasets) {
+                if (state.code.datasets[i].id === state.code.filterKey) {
+                    result = state.code.datasets[i];
+                }
+            }
+```
+
+state.code.filterKey改变才会引起data()函数触发
+
+```
+for(let i in state.code.datasets) {
+                if (state.code.datasets[i].id === '') {
+                    result = state.code.datasets[i];
+                }
+            }
+```
+这样data()函数将只调用一次,相应的initCode()才会触发
+```
+<textarea class="code-input" :value="initCode()"
+```
