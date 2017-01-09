@@ -28,14 +28,10 @@ export default {
     <svg class="sketch">
         <g class="configure" :name="rootName">
             <rect class="background"></rect>
+            <rect class="picture"></rect>
             <path class="separator" d="M0,15 L60,15"></path>
             <text class="name">
                 <tspan>Region</tspan>
-            </text>
-            <text class="event">
-                <tspan dy="0em"></tspan>
-                <tspan dy="1em" x="0"></tspan>
-                <tspan dy="1em" x="0"></tspan>
             </text>
             <Toolbox></Toolbox>
         </g>
@@ -46,11 +42,15 @@ export default {
     .sketch {
         width: 60px;
         height: 60px;
-        cursor: move;
         .configure {
             cursor: move;
         }
         .background {
+           width: 60px;
+           height: 60px;
+           opacity: 0.0; 
+        }
+        .picture {
             width: 60px;
             height: 60px;
             rx: 10;
@@ -68,11 +68,6 @@ export default {
             font-size: 12px;
             font-weight: bold;
             transform: translate(30px, 10px);
-        }
-        .event {
-            font-size: 8px;
-            font-weight: bold;
-            transform: translate(8px, 25px);
         }
     }
 </style>

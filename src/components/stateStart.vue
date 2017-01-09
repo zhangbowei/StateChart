@@ -40,15 +40,14 @@ export default {
     .sketch {
         width: 60px;
         height: 60px;
-        cursor: move;
         .configure {
             cursor: move;
         }
         .background {
-            width: 60px;
-            height: 60px;
-            rx: 10;
-            ry: 10;
+            width: 40px;
+            height: 40px;
+            x: 10;
+            y: 10;
             opacity: 0.0;
         }
         .picture {

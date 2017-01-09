@@ -46,7 +46,7 @@ export default {
 
 <style scoped lang="less">
     .link {
-        cursor: auto;
+        cursor: pointer;
         opacity: 0.8;
         stroke: #333333;
         stroke-width: 3;
