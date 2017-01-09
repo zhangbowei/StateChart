@@ -106,8 +106,8 @@ export default {
 
         triggerWatchLink: function(el) {
             this.eventTurn;
-            const vel = V(utils.findParentByName(el, this.rootName));
-            return vel.bbox().x + vel.bbox().y;
+            const data = V(utils.findParentByName(el, this.rootName)).bbox();
+            return ~~(data.x - data.y + data.height - data.width);
         },
 
         watchLink: function(index) {

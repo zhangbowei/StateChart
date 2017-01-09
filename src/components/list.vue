@@ -1,7 +1,8 @@
 <script>
 import { mapState } from 'vuex';
 import Region from './region';
-import State from './state';
+import StateStart from './stateStart';
+import StateEnd from './stateEnd';
 import Introduction from './introduction';
 
 export default {
@@ -19,7 +20,7 @@ export default {
 		  }
 	  }
 	},
-    components: { Region, State, Introduction},
+    components: { Region, StateStart, StateEnd, Introduction},
     computed: mapState({
         datasets: state => state.card.datasets.filter(data => data.name.includes(state.card.filterKey))
     }) 

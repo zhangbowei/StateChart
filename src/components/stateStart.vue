@@ -10,15 +10,17 @@ export default {
         rootName: state => state.tool.root.name,
         scaleName: state => state.tool.scale.name,
         linkName: state => state.tool.link.name,
-        boxName: state => state.tool.box.name
+        boxName: state => state.tool.box.name,
+        signName: state => state.tool.sign.name
     }),
     mounted: function() {
-       const position = [{x: 0, y:30}, {x: 30, y:0}, {x: 30, y:60}, {x: 60, y:30}];
+       const position = [{x: 10, y:30}, {x: 30, y:10}, {x: 30, y:50}, {x: 50, y:30}];
        
        this.$el.querySelectorAll(wrapNameSelector(this.linkName)).forEach(function(el, index) {
            V(el).translate(position[index].x, position[index].y);
        });
-       V(this.$el.querySelector(wrapNameSelector(this.scaleName))).translate(60, 60);
+       V(this.$el.querySelector(wrapNameSelector(this.scaleName))).translate(50, 50);
+       V(this.$el.querySelector(wrapNameSelector(this.signName))).translate(10, 10);
        this.$el.querySelector(wrapNameSelector(this.boxName)).setAttribute('display', 'none'); 
     } 
 };
@@ -27,16 +29,8 @@ export default {
 <template>
     <svg class="sketch">
         <g class="configure" :name="rootName">
-            <rect class="background"></rect>
-            <path class="separator" d="M0,15 L60,15"></path>
-            <text class="name">
-                <tspan>State</tspan>
-            </text>
-            <text class="event">
-                <tspan dy="0em"></tspan>
-                <tspan dy="1em" x="0"></tspan>
-                <tspan dy="1em" x="0"></tspan>
-            </text>
+            <rect class="background"></rect> 
+            <circle class="picture"></circle>
             <Toolbox></Toolbox>
         </g>
     </svg>
@@ -55,24 +49,15 @@ export default {
             height: 60px;
             rx: 10;
             ry: 10;
-            fill: #fff9ca;
+            opacity: 0.0;
+        }
+        .picture {
+            cx: 30;
+            cy: 30;
+            r: 20; 
+            fill: #93A1A1;
             stroke: #333;
             stroke-width: 1;
-        }
-        .separator {
-            stroke: #333;
-            stroke-width: 1px;
-        }
-        .name {
-            text-anchor: middle;
-            font-size: 12px;
-            font-weight: bold;
-            transform: translate(30px, 10px);
-        }
-        .event {
-            font-size: 8px;
-            font-weight: bold;
-            transform: translate(8px, 25px);
         }
     }
 </style>

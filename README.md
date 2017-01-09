@@ -168,3 +168,7 @@ for(let i in state.code.datasets) {
 ```
 <textarea class="code-input" :value="initCode()"
 ```
+##prism.js
+最终全部使用了codepen本身的配套js, css. (即prism.js 0.0.4)
+
+使用prism.js 最新的（2017-1-8 没找到官网的版本号) TAB可能产生错位。

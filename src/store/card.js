@@ -11,18 +11,13 @@ const store = {
                 introduction: 'testtesttes'
             },
             {
-                name: '区域',
-                component: 'Region',
+                name: '起始状态',
+                component: 'StateStart',
                 introduction: 'testtesttes'
             },
             {
-                name: '区域',
-                component: 'Region',
-                introduction: 'testtesttes'
-            },
-            {
-                name: '区域',
-                component: 'Region',
+                name: '终止状态',
+                component: 'StateEnd',
                 introduction: 'testtesttes'
             }
         ],
