@@ -76,12 +76,12 @@ export default {
             
             if (e.type === "mousedown") {
                 _.extend(start, _.pick(V(el).bbox(), 'x', 'y'), {id: el.id});
-                _.extend(end, utils.makeMouseFirst({x: e.offsetX, y: e.offsetY}), {id: undefined});
+                _.extend(end, {x: e.offsetX, y: e.offsetY}, {id: undefined});
                 dataSet.push({start, end}); 
             } 
 
             if (e.type === "mousemove") {
-                _.extend(end, utils.makeMouseFirst({x: e.offsetX, y: e.offsetY}, 5));
+                _.extend(end, utils.makeMouseFirst({start: dataSet[endIndex].start, end:{x: e.offsetX, y: e.offsetY}}));
                 _.extend(dataSet[endIndex].end, end);
             }
 

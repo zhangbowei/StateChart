@@ -30,12 +30,38 @@ export function findParentByName(el, nameSet) {
     return null;
 }
 
-export function makeMouseFirst(data, offset) {
-    offset = Math.abs(offset) || 1;
-    for (let item in data) {
-        data[item] -= offset;
+export function getAngle(data) {
+    const width = data.end.x - data.start.x;
+    const height= data.end.y - data.start.y;
+    let angle = Math.atan2(Math.abs(height), Math.abs(width))*180/Math.PI;
+    if (width < 0) {
+        if (height < 0) {
+            angle = angle + 180;
+        } else {
+            angle = 180 - angle; 
+        }
+    } else {
+        if (height < 0) {
+            angle = -angle; 
+        } else {
+            angle = angle;
+        }
     }
-    return data;
+    return angle; 
+}
+
+export function makeMouseFirst(data, offset) {
+    offset = offset || 3;
+
+    const width = data.end.x - data.start.x;
+    const height= data.end.y - data.start.y;
+    const arc = Math.atan(Math.abs(height/width));
+    let offsetX = offset * Math.cos(arc); 
+    let offsetY = offset * Math.sin(arc); 
+    offsetX = width < 0 ? -offsetX : offsetX;
+    offsetY = height < 0 ? -offsetY : offsetY;
+
+    return {x: data.end.x - offsetX, y:data.end.y - offsetY};
 }
 
 export function addEventListener(events, el, func) {
