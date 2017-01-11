@@ -2,6 +2,7 @@
   "name": "state.io",
   "description": "A State fsm project",
   "author": "ZhangBowei",
+  "license": "MIT",
   "scripts": {
     "dev": "webpack-dev-server --inline --hot",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"

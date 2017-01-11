@@ -26,8 +26,8 @@ const store = {
             name: 'sign',
             method: () => {} 
         },
-        transition: {
-            name: 'transition',
+        path: {
+            name: 'path',
             method: () => {} 
         }
     },

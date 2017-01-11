@@ -24,7 +24,7 @@ export default {
         id: function() {
             return [this.data.start.id, this.data.end.id].join('_');
         },
-        transitionName: state => state.tool.transition.name
+        pathName: state => state.tool.path.name
     }),
     watch: {
         pathD: function() {
@@ -38,7 +38,7 @@ export default {
 </script>
 
 <template>
-    <g :name="transitionName" :id="id">
+    <g :name="pathName" :id="id">
         <path class="link" :d="pathD"></path>
         <path class="arrow" :d="arrowD"></path>
     </g>

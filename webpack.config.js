@@ -10,7 +10,7 @@ module.exports = {
         // 打包后输出的目录
         path: path.resolve(__dirname, './dist'),
         // 打包后资源文件的前缀
-        publicPath: './dist/',
+        publicPath: '/dist/',
         filename: '[name].js'
     },
     plugins: [

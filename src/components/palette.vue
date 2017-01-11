@@ -39,7 +39,7 @@ export default {
         linkName: state => state.tool.link.name,
         rootName: state => state.tool.root.name,
         signName: state => state.tool.sign.name,
-        transitionName: state => state.tool.transition.name
+        pathName: state => state.tool.path.name
     }),
     methods: {
         ...mapActions([SET_ROOT_METHOD, SET_LINK_METHOD, SET_CODE_KEY]),
@@ -132,7 +132,7 @@ export default {
             this.component ? this.method(this.component, e) : null;
 
             //send data to codeEditor
-            const item = utils.findParentByName(e.target, [this.transitionName, this.rootName]);
+            const item = utils.findParentByName(e.target, [this.pathName, this.rootName]);
             this[SET_CODE_KEY](item ? item.id : null);
         },
         moveComponent: function(e) {
