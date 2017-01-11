@@ -1,8 +1,10 @@
 <script>
+import Tag from "./tag";
 import { mapState } from 'vuex';
 import {getAngle, makeMouseFirst} from "../utils";
 
 export default {
+    components: { Tag},
     props: ['data'], 
     data() {
         return {
@@ -41,6 +43,7 @@ export default {
     <g :name="pathName" :id="id">
         <path class="link" :d="pathD"></path>
         <path class="arrow" :d="arrowD"></path>
+        <Tag data="Transition"></Tag>
     </g>
 </template>
 

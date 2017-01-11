@@ -1,7 +1,7 @@
 <script>
 import 'vendor/prism.css';
 import Prism from "vendor/prism";
-import {setToolDisplay, wrapIdSelector} from "../utils";
+import {setToolDisplay, wrapIdSelector, wrapNameSelector} from "../utils";
 import { mapState } from 'vuex';
 import { mapActions } from 'vuex';
 import { ADD_CODE_DATA, UPDATE_CODE_DATA} from 'store/code';
@@ -104,7 +104,11 @@ export default {
 
             if (!result) {
                 this.component = document.querySelector(wrapIdSelector(state.code.filterKey));
-                result = {id: this.component.id, name: this.component.getAttribute('name'), code: 'function() {}'};
+                result = {
+                    id: this.component.id, 
+                    name: this.component.querySelector(wrapNameSelector(this.tagName)).getAttribute('value'), 
+                    code: ['//ID:',this.component.id, '\n', 'function() {}'].join(' ')
+                };
                 this[ADD_CODE_DATA](result);
             } else {
                 this.component = result.id ? document.querySelector(wrapIdSelector(result.id)) : undefined;
@@ -113,7 +117,8 @@ export default {
             return result;
         },
         boxName: state => state.tool.box.name,
-        signName: state => state.tool.sign.name
+        signName: state => state.tool.sign.name,
+        tagName: state => state.tool.tag.name
     }),
     methods: {
         ...mapActions([ADD_CODE_DATA, UPDATE_CODE_DATA]),

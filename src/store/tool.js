@@ -29,6 +29,10 @@ const store = {
         path: {
             name: 'path',
             method: () => {} 
+        },
+        tag: {
+            name: 'tag',
+            method: () => {}
         }
     },
     mutations: {

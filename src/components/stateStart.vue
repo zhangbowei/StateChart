@@ -1,11 +1,12 @@
 <script>
 import {wrapNameSelector} from "../utils";
 import Toolbox from "./toolbox";
+import Tag from "./tag";
 import { mapState } from 'vuex';
 
 
 export default {
-    components: { Toolbox},
+    components: { Toolbox, Tag},
     computed: mapState({
         rootName: state => state.tool.root.name,
         scaleName: state => state.tool.scale.name,
@@ -32,6 +33,7 @@ export default {
             <rect class="background"></rect> 
             <circle class="picture"></circle>
             <Toolbox></Toolbox>
+            <Tag data="PseudoState"></Tag>
         </g>
     </svg>
 </template>
