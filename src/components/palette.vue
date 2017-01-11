@@ -130,10 +130,6 @@ export default {
         chooseComponent: function(e) {
             this.component = utils.findParentByName(e.target, this.nameSet);
             this.component ? this.method(this.component, e) : null;
-
-            //send data to codeEditor
-            const item = utils.findParentByName(e.target, [this.pathName, this.rootName]);
-            this[SET_CODE_KEY](item ? item.id : null);
         },
         moveComponent: function(e) {
             this.component ? this.method(this.component, e) : null;
@@ -141,6 +137,10 @@ export default {
         removeComponent: function(e) {
             this.component ? this.method(this.component, e) : null;
             this.component = undefined;
+
+            //send data to codeEditor, when 'mouseUp' to promise latest component position.
+            const item = utils.findParentByName(e.target, [this.pathName, this.rootName]);
+            this[SET_CODE_KEY](item ? item.id : null);
         },
 
         //UX function 

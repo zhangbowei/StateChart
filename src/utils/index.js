@@ -55,7 +55,7 @@ export function makeMouseFirst(data, offset) {
 
     const width = data.end.x - data.start.x;
     const height= data.end.y - data.start.y;
-    const arc = Math.atan(Math.abs(height/width));
+    const arc = Math.atan2(Math.abs(height), Math.abs(width));
     let offsetX = offset * Math.cos(arc); 
     let offsetY = offset * Math.sin(arc); 
     offsetX = width < 0 ? -offsetX : offsetX;

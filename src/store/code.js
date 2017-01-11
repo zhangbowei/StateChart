@@ -9,6 +9,7 @@ const store = {
             {
                 id: '',
                 name: 'blank',
+                parent: '',
                 code: '// Switch the language and put some code on me :)           ↑↑↑↑↑↑'
             }
         ],
@@ -25,7 +26,7 @@ const store = {
         [UPDATE_CODE_DATA](state, value) {
             for(let i in state.datasets) {
                 if (state.datasets[i].id === value.id) {
-                    _.extend(state.datasets[i], _.pick(value, 'code'));
+                    _.extend(state.datasets[i], _.pick(value, 'code', 'parent'));
                     break;
                 }
             }

@@ -104,16 +104,39 @@ export default {
 
             if (!result) {
                 this.component = document.querySelector(wrapIdSelector(state.code.filterKey));
-                result = {
-                    id: this.component.id, 
-                    name: this.component.querySelector(wrapNameSelector(this.tagName)).getAttribute('value'), 
-                    code: ['//ID:',this.component.id, '\n', 'function() {}'].join(' ')
-                };
-                this[ADD_CODE_DATA](result);
+                if (this.component) {
+                    result = {
+                        id: this.component.id, 
+                        name: this.component.querySelector(wrapNameSelector(this.tagName)).getAttribute('value'), 
+                        parent: this.component.parentNode.id,
+                        code: [
+                            ['//ID:',this.component.id].join(' '),
+                            'function() {}'
+                        ].join('\n')
+                    };
+                    this[ADD_CODE_DATA](result);
+                }
             } else {
                 this.component = result.id ? document.querySelector(wrapIdSelector(result.id)) : undefined;
+                if (this.component) {
+                    this[UPDATE_CODE_DATA]({
+                        id: result.id, 
+                        parent: this.component.parentNode.id
+                    });
+                } 
             }
-            
+
+            //update infors list
+            if (!result.id) {
+                this[UPDATE_CODE_DATA]({
+                    id: result.id, 
+                    code: state.code.datasets.map(function(item) {
+                        const str = ['//Data','ID: '+item.id, 'Parent: '+item.parent].join('\n');
+                        return item.id ? str : '//Datasets';
+                    }).join('\n')
+                });
+            }
+
             return result;
         },
         boxName: state => state.tool.box.name,
@@ -127,7 +150,10 @@ export default {
             return this.data.code;
         },
         updataCode(value) {
-            this[UPDATE_CODE_DATA]({id: this.data.id, code: value});
+            this[UPDATE_CODE_DATA]({
+                id: this.data.id, 
+                code: value
+            });
         },
         displayState() {
             if (this.component) {
