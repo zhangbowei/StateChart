@@ -1,7 +1,8 @@
-<img src="https://ww4.sinaimg.cn/large/006tNbRwly1fdlcoiu8epg30g60cfk4q.gif" width = "400" height = "300" alt="图片名称" align=center />
 ##项目概览
 ###[样本案例](https://state.software/#model-panel)
 <img src="https://ww2.sinaimg.cn/large/006tNbRwly1fdlcna76vfj31jc0nwgp3.jpg" width = "400" height = "300" alt="图片名称" align=center />
+###绘制过程
+![](https://ww4.sinaimg.cn/large/006tNbRwly1fdlcoiu8epg30g60cfk4q.gif)
 ###绘制结果
 <img src="https://ww1.sinaimg.cn/large/006tNbRwly1fdlcneju9lj314q0ow77a.jpg" width = "400" height = "300" alt="图片名称" align=center />
 <img src="https://ww3.sinaimg.cn/large/006tNbRwly1fdlcn8ft20j318s0oq0we.jpg" width = "500" height = "300" alt="图片名称" align=center />
