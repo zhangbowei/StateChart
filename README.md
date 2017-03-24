@@ -1,5 +1,5 @@
 ##项目概览
-###[样本案例](https://state.software/#model-panel)
+###样本案例
 <img src="https://ww2.sinaimg.cn/large/006tNbRwly1fdlcna76vfj31jc0nwgp3.jpg" width = "400" height = "300" alt="图片名称" align=center />
 
 ###绘制过程
