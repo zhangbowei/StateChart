@@ -15,7 +15,7 @@ var MicroCode = (function(){
 			this.renderOutput(outputSel, $(inputSel)[0].value);
 			this.listenerForScroll(inputSel, outputSel);
 		},
-		
+
 		listenForInput: function(inputSel){
 			var self = this;
 
@@ -36,7 +36,7 @@ var MicroCode = (function(){
 
 			Prism.highlightAll();
 		},
-		
+
 		listenForLanguage: function(languageSel, outputSel, inputSel){
 			var self = this;
 			$(languageSel).on('change', function(){
@@ -44,41 +44,41 @@ var MicroCode = (function(){
 					.removeClass()
 					.addClass('language-' + this.value)
 					.removeAttr('data-language');
-				
+
 				$(outputSel)
 					.removeClass()
 					.addClass('code-output language-' + this.value);
-				
+
 				$(inputSel)
 					.val('');
-				
+
 				$('code', outputSel)
 					.html('');
-				
+
 				self.focusInput(inputSel);
 			});
 		},
-		
+
 		listenerForScroll: function(inputSel, outputSel){
 			$(inputSel).on('scroll', function(){
 				console.log(this.scrollTop);
 				$(outputSel)[0].scrollTop = this.scrollTop;
 			});
 		},
-		
+
 		renderOutput: function(outputSel, value){
 			$('code', outputSel)
 				.html(value.replace(/&/g, "&amp;").replace(/</g, "&lt;")
 				.replace(/>/g, "&gt;") + "\n");
-			
+
 			Prism.highlightAll();
 		},
-		
+
 		focusInput: function(inputSel){
 			var input = $(inputSel);
-			
+
 			input.focus();
-			
+
 			input[0].selectionStart = input[0].value.length;
 			input[0].selectionEnd = input[0].value.length;
 		}
@@ -106,8 +106,8 @@ export default {
                 this.component = document.querySelector(wrapIdSelector(state.code.filterKey));
                 if (this.component) {
                     result = {
-                        id: this.component.id, 
-                        name: this.component.querySelector(wrapNameSelector(this.tagName)).getAttribute('value'), 
+                        id: this.component.id,
+                        name: this.component.querySelector(wrapNameSelector(this.tagName)).getAttribute('value'),
                         parent: this.component.parentNode.id,
                         code: [
                             ['//ID:',this.component.id].join(' '),
@@ -120,16 +120,16 @@ export default {
                 this.component = result.id ? document.querySelector(wrapIdSelector(result.id)) : undefined;
                 if (this.component) {
                     this[UPDATE_CODE_DATA]({
-                        id: result.id, 
+                        id: result.id,
                         parent: this.component.parentNode.id
                     });
-                } 
+                }
             }
 
             //update infors list
             if (!result.id) {
                 this[UPDATE_CODE_DATA]({
-                    id: result.id, 
+                    id: result.id,
                     code: state.code.datasets.map(function(item) {
                         const str = ['//Data','ID: '+item.id, 'Parent: '+item.parent].join('\n');
                         return item.id ? str : '//Datasets';
@@ -151,7 +151,7 @@ export default {
         },
         updataCode(value) {
             this[UPDATE_CODE_DATA]({
-                id: this.data.id, 
+                id: this.data.id,
                 code: value
             });
         },
@@ -200,7 +200,7 @@ export default {
         <div class="credits">
             Enjoy yourself!
         </div>
-    </main>>
+    </main>
 </template>
 
 <style scoped lang="less">
@@ -210,12 +210,12 @@ export default {
     *:focus {
         outline: none;
     }
-    
+
     a {
         text-decoration: none;
         color: inherit;
     }
-    
+
     main {
         height: 100%;
         weight: 100%;
@@ -225,7 +225,7 @@ export default {
         align-items: center;
         flex-direction: column;
     }
-    
+
     .title {
         color: #fff;
         text-align: center;
@@ -239,7 +239,7 @@ export default {
             margin-top: 0.4em;
         }
     }
-    
+
     .credits {
         color: #fff;
         text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
@@ -247,7 +247,7 @@ export default {
         font-size: 0.8em;
         opacity: 0.5;
     }
-    
+
     .window {
         width: 90%;
         height: 90%;
