@@ -1,14 +1,18 @@
-## 项目概览
 
-### [样本案例](https://state.software/#model-panel)
+
+[TOC]
+
+# 项目概览:happy:
+
+## [样本案例](https://state.software/#model-panel)
 
 <img src="https://ww2.sinaimg.cn/large/006tNbRwly1fdlcna76vfj31jc0nwgp3.jpg" width = "400" height = "300" alt="图片名称" align=center />
 
-### 绘制过程
+## 绘制过程
 
 <img src="https://ww4.sinaimg.cn/large/006tNbRwly1fdlcoiu8epg30g60cfk4q.gif" width = "400" height = "300" alt="图片名称" align=center />
 
-### 绘制结果
+## 绘制结果
 
 <img src="https://ww1.sinaimg.cn/large/006tNbRwly1fdlcneju9lj314q0ow77a.jpg" width = "400" height = "300" alt="图片名称" align=center />
 <img src="https://ww3.sinaimg.cn/large/006tNbRwly1fdlcn8ft20j318s0oq0we.jpg" width = "500" height = "300" alt="图片名称" align=center />
@@ -25,6 +29,148 @@ npm run dev
 # build for production with minification
 npm run build
 ```
+
+# 要点归纳 :cool:
+
+
+
+1. getBbox(true)/getBbox() 区别： 没有文档，就阅读源码.
+2. sideBar：小数取整导致值缺失(越积累越多)，极快速拖动条框，导致条框跟随(越界时无法初始化)(preventDefault解决)，jQuery的draggable使用(stop状态一定要重置).
+3. 路径跟踪(vue.watch的属性直接赋值才会引起改变，如果是对象，对对象属性赋值无法触发)
+4. 箭头角度(Math.atan2，四个象限想不清除，后来实操解决)
+5. 鼠标带动 路径180转动时，在第四/三象限需要 负偏移些， 其他两个象限需要正偏移，**否则**鼠标下面是路径元素，松开时无法捕捉到 状态图.(这里offset即偏移是path(带角度)偏移，然后计算得到相应的X，Y轴偏移量，直接定死X，Y偏移量太Low了.)
+6. SVG内部的SVG图，嵌套放缩.
+
+```
+function calculateNowScale(originalScale, containsScale, returnPalette) {
+    let nowScale = _.clone(originalScale);
+
+    if (returnPalette) {
+    containsScale.forEach(function(item) {
+    nowScale.x *= item.x;
+    nowScale.y *= item.y;
+    })
+    } else {
+    containsScale.forEach(function(item) {
+    nowScale.x /= item.x;
+    nowScale.y /= item.y;
+    })
+    }
+
+    return nowScale;
+    }
+```
+
+1. SVG 中嵌套的SVG图来回移动. (先发现所有的root元素，)("mousedown"在platte中移动；"mouseup"发现其父元素，根据迭代计算的放缩值计算位移值)
+
+```
+function translateTheRoot(el, contains, returnPalette) {
+    const vel = V(el);
+    let scale;
+    let relativeTranslate;
+    let absoluteTranslate;
+
+    if (contains.length) {
+        scale = contains.map(function(el) {
+            return parseScaleString(el);
+        }).reduce(function(a, b) {
+            return { x: a.x * b.x, y: a.y * b.y };
+        });
+        relativeTranslate = vel.bbox(false, contains[0]);
+        absoluteTranslate = V(contains[0]).bbox();
+    } else {
+        scale = { x: 1, y: 1 };
+        relativeTranslate = vel.bbox();
+        absoluteTranslate = V(el.ownerSVGElement).bbox();
+    }
+
+    const nowTranslate = {};
+    if (returnPalette) {
+        nowTranslate.x = (relativeTranslate.x * scale.x) + absoluteTranslate.x;
+        nowTranslate.y = (relativeTranslate.y * scale.y) + absoluteTranslate.y;
+    } else {
+        nowTranslate.x = (relativeTranslate.x - absoluteTranslate.x) / scale.x;
+        nowTranslate.y = (relativeTranslate.y - absoluteTranslate.y) / scale.y;
+    }
+
+    vel.translate(nowTranslate.x, nowTranslate.y, { absolute: true });
+}
+```
+
+1. 解耦(每个组件内部有自己的Method，画板platte值负责触发)(通过MapAction函数注册)(findParentByName先确定元素类型)
+
+```
+ //event choose function
+        chooseComponent: function(e) {
+            this.component = utils.findParentByName(e.target, this.nameSet);
+            this.component ? this.method(this.component, e) : null;
+        },
+        moveComponent: function(e) {
+            this.component ? this.method(this.component, e) : null;
+        },
+        removeComponent: function(e) {
+            this.component ? this.method(this.component, e) : null;
+            this.component = undefined;
+
+            //send data to codeEditor, when 'mouseUp' to promise latest component position.
+            const item = utils.findParentByName(e.target, [this.pathName, this.rootName]);
+            this[SET_CODE_KEY](item ? item.id : null);
+        },
+```
+
+```
+<svg class="sketch" @mousemove="moveComponent" @mouseup="removeComponent" @mousedown="chooseComponent" @mouseover="displayTool"  @mouseout="hideTool">
+```
+
+1. 柯里化函数(不同需求只是变量不同，逻辑相同) (取代重载利器)
+
+```
+export function curryIt(fn) {
+    const len = fn.length;
+    const args = [];
+
+    const func = function(num) {
+        args.push(num);
+        if (args.length === len) {
+            return () => fn.apply(null, args);
+        } else {
+            return func;
+        }
+    }
+
+    return func;
+}
+```
+
+1. $watch与compute
+
+$watch相比compute更灵活，也就是说$watch位置随意，可访问的变量灵活了.
+
+1. 路径/箭头实现
+
+v-for循环出linkData中的元素数量，:data绑定pointLink.vue的`props: ['data'], `. computed中的pathD，arrowD即长和箭头都跟着联动了.
+
+=> 主面板只要watch事件并更改linkData值即可.
+
+```
+<PointLink v-for="item in linkData" :data="item"></PointLink>
+```
+
+1. 编辑代码面板
+
+mapState的store中数据变更也能带动更新computed相应的变量.(相当于引用了data)
+
+```
+ computed: mapState({
+        datasets: state => state.card.datasets.filter(data => data.name.includes(state.card.filterKey))
+    })
+```
+
+利用@input="updataCode($event.target.value)"更新.
+
+
+
+# 开发随笔 :note:
 
 ## 总结
 
