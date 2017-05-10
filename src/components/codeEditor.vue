@@ -181,8 +181,6 @@ export default {
 
 <template>
     <main class="view" @mouseover="displayState" @mouseout="hideState">
-        <h1 class="title"></h1>
-
         <div class="window">
             <div class="window-header">
                 <div class="action-buttons"></div>
@@ -221,7 +219,6 @@ export default {
         weight: 100%;
         min-height: 100vh;
         display: flex;
-        display: -webkit-flex;
         align-items: center;
         flex-direction: column;
     }
@@ -251,6 +248,7 @@ export default {
     .window {
         width: 90%;
         height: 90%;
+        margin-top: 48px;
         background: @color-2nd;
         border-radius: 0.3rem;
         box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);

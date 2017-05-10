@@ -4,9 +4,10 @@ import Search from 'components/Search';
 import List from 'components/List';
 import Palette from 'components/palette';
 import CodeEditor from 'components/CodeEditor';
+import MenuBar from 'components/MenuBar';
 
 export default {
-    components: { Sidebar, Search, List, Palette, CodeEditor},
+    components: { Sidebar, Search, List, Palette, CodeEditor, MenuBar},
     directives: {
 
     }
@@ -19,10 +20,11 @@ export default {
             <Search></Search>
             <List></List>
         </div>
-        <Sidebar class="L" itemX=".menu" itemY=".workspace" limit="15%"></Sidebar>
+        <Sidebar class="L order" itemX=".menu" itemY=".workspace" limit="15%"></Sidebar>
         <Palette class="Box workspace"></Palette>
-        <Sidebar class="R" itemX=".workspace" itemY=".code" limit="8%"></Sidebar>
+        <Sidebar class="R order" itemX=".workspace" itemY=".code" limit="8%"></Sidebar>
         <div class="Box code">
+            <MenuBar></MenuBar>
             <CodeEditor></CodeEditor>
         </div>
     </div>
@@ -38,6 +40,7 @@ export default {
             float: left;
             width: 20%;
             height: 100%;
+            position: relative;
         }
         .workspace {
             width: 60%;
@@ -47,6 +50,9 @@ export default {
         }
         .R {
             left: 80%;
+        }
+        .order {
+            z-index: 1;
         }
     }
 </style>
