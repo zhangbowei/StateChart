@@ -16,14 +16,14 @@ export default {
 		  bind(el) {
 			  $(el).draggable({
 					helper: 'clone'
-     		  }); 
+     		  });
 		  }
 	  }
 	},
     components: { Region, StateStart, StateEnd, Introduction},
     computed: mapState({
         datasets: state => state.card.datasets.filter(data => data.name.includes(state.card.filterKey))
-    }) 
+    })
 };
 </script>
 
@@ -46,20 +46,20 @@ export default {
 	a {
 		transition: all 0.3s ease;
 	}
-	
+
 	.wrapper {
 		margin: 5px 0px;
 		border-radius: 10em;
 		box-sizing: border-box;
 	}
-	
+
 	header {
 		text-align: right;
 		padding: 1px;
 		margin-bottom: 5px;
 		background-color: #4F6C75;
 	}
-	
+
 	header a {
 		font-size: 20px;
 		color: #93A1A1;
@@ -70,34 +70,34 @@ export default {
 		text-align: center;
 		display: inline-block;
 	}
-	
+
 	header a:hover,
 	.list-mode header a.hide-list:hover {
 		background-color: #7E9496;
 	}
-	
+
 	header a.hide-list {
 		background-color: #7E9496;
 	}
-	
+
 	.list-mode header a.hide-list {
 		background-color: #4F6C75;
 	}
-	
+
 	.list-mode header a.show-list {
 		background-color: #7E9496;
 	}
-	
+
 	.container:after {
 		content: "";
 		clear: both;
 		display: table;
 	}
-	
+
 	.container {
 		margin: 10px 0px;
 	}
-	
+
 	.wrapper .box {
 		float: left;
 		overflow: hidden;
@@ -107,11 +107,11 @@ export default {
 		transition: all 1.0s ease;
 		border-bottom: solid 1px #4F6C75;
 	}
-	
+
 	.wrapper.list-mode .container {
 		padding-right: 0px;
 	}
-	
+
 	.wrapper.list-mode .box {
 		width: 100%;
 	}

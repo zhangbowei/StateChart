@@ -1,21 +1,31 @@
 <script>
+import { mapState } from 'vuex';
+import Save from './save';
+import Collapse from './collapse';
+
 export default {
   data() {
     return {
-      isActive: false
+      isExpand: false
+    }
+  },
+  computed: mapState({
+    datasets: state => state.setting.datasets
+  }),
+  components: { Collapse, Save },
+  methods: {
+    activeChange(value) {
+      this.isExpand = value;
     }
   }
+
 };
 </script>
 
 <template>
-  <article class='sketch' v-bind:class="{sketchExpend: isActive}">
+  <article class='sketch' v-bind:class="{sketchExpend: isExpand}">
     <ul>
-      <li class='entypo-tools' @click="isActive = isActive ? false : true">
-        <a href="javascript:void(0)" v-bind:class="[isActive ? 'entypo-up-circled' : 'entypo-down-circled']">
-          {{isActive ? '收起' : '展开'}}菜单
-        </a>
-      </li>
+      <li :is="item.component" :data="item" v-for="item in datasets" v-on:activeSwitch="activeChange"></li>
     </ul>
   </article>
 </template>
@@ -56,6 +66,7 @@ article:before {
 
 ul {
   list-style-type: none;
+  height: 100%;
 }
 
 li {
@@ -63,29 +74,8 @@ li {
   color: #000;
 }
 
-li:hover {
-  font-size: 20px;
-}
-
-li:hover:active {
-  margin-top: 2px;
-  margin-left: 2px;
-}
-
 li:before {
   color: #597572;
   margin-right: 2px;
-}
-
-a {
-  background: rgba(0, 0, 0, .1);
-  color: yellow;
-  text-decoration: none;
-  text-transform: uppercase;
-  border-radius: 5px;
-  letter-spacing: 1px;
-  display: inline-block;
-  padding: 0 2px;
-  padding-top: 1px;
 }
 </style>
