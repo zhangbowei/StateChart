@@ -27,10 +27,9 @@ export default {
   left: 0;
   right: 0;
   top: 0;
-  bottom: 100px;
   margin: 5px auto;
   width: 90%;
-  min-height: 38px;
+  height: 100%;
   max-height: 38px;
   background-color: rgba(255, 255, 255, .9);
   overflow: hidden;
