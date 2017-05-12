@@ -1,15 +1,15 @@
 <script>
 import 'vendor/entypo.css';
 export default {
-    props: ['content'], 
+    props: ['content'],
 };
 </script>
 
 <template>
   <article class='sketch'>
     <ul>
-      <li class='entypo-vcard'><a href="javascript:void(0)">名称: </a>{{content.name}}</li>
-      <li class='entypo-credit-card'>{{content.introduction}}</li>
+      <li class='entypo-credit-card'><a href="javascript:void(0)">名称: </a>{{content.name}}</li>
+      <li class='entypo-vcard'>{{content.introduction}}</li>
     </ul>
   </article>
 </template>
@@ -28,27 +28,27 @@ export default {
     font-family: 'entypo', sans-serif;
     font-size: 12px;
   }
-  
+
   article:before {
     content: '';
     background: inherit;
     filter: blur(5px);
   }
-  
+
   ul {
     list-style-type: none;
   }
-  
+
   li {
     margin-bottom: .5rem;
     color: #000;
   }
-  
+
   li:before {
     color: #597572;
     margin-right: 2px;
   }
-  
+
   a {
     background: rgba(0, 0, 0, .1);
     color: yellow;

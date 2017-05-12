@@ -24,26 +24,27 @@ export default {
             const result = [];
             for(let item in state.tool) {
                 result.push(state.tool[item].name);
-            } 
+            }
             return result;
         },
         method: function(state) {
             for(let item in state.tool) {
                 if (state.tool[item].name === this.component.getAttribute('name')) {
                     return state.tool[item].method;
-                } 
-            } 
+                }
+            }
             return null;
         },
         boxName: state => state.tool.box.name,
         linkName: state => state.tool.link.name,
         rootName: state => state.tool.root.name,
         signName: state => state.tool.sign.name,
-        pathName: state => state.tool.path.name
+        pathName: state => state.tool.path.name,
+        paletteId: state => state.save.paletteId
     }),
     methods: {
         ...mapActions([SET_ROOT_METHOD, SET_LINK_METHOD, SET_CODE_KEY]),
-        
+
         //logic function
         changeRoot(el, e) {
             const vel = V(el);
@@ -51,12 +52,12 @@ export default {
             if (e.type === "mousedown") {
                 //protect .bbox() is pure x,y,width,height (toolbox should be hidden)
                 utils.setToolDisplay([el, el.parentNode], this.boxName, 'none');
-                utils.autoTransformTheRoot(el, this.rootName, true); 
+                utils.autoTransformTheRoot(el, this.rootName, true);
                 V(this.gStates).append(vel);
             }
 
             if (e.type === "mousemove") {
-               vel.translate(~~e.movementX, ~~e.movementY); 
+               vel.translate(~~e.movementX, ~~e.movementY);
             }
 
             if (e.type === "mouseup") {
@@ -64,8 +65,8 @@ export default {
                let nearContain = utils.findNearContain(el, allRoots);
                if (nearContain) {
                     V(nearContain).append(vel);
-                    utils.autoTransformTheRoot(el, this.rootName, false); 
-               } 
+                    utils.autoTransformTheRoot(el, this.rootName, false);
+               }
                utils.setToolDisplay(el, this.boxName, 'block');
             }
         },
@@ -73,12 +74,12 @@ export default {
             const dataSet = this.linkData;
             const endIndex = dataSet.length-1;
             const start = {}, end = {};
-            
+
             if (e.type === "mousedown") {
                 _.extend(start, _.pick(V(el).bbox(), 'x', 'y'), {id: el.id});
                 _.extend(end, {x: e.offsetX, y: e.offsetY}, {id: undefined});
-                dataSet.push({start, end}); 
-            } 
+                dataSet.push({start, end});
+            }
 
             if (e.type === "mousemove") {
                 _.extend(end, utils.makeMouseFirst({start: dataSet[endIndex].start, end:{x: e.offsetX, y: e.offsetY}}));
@@ -91,7 +92,7 @@ export default {
                 if(!!endEl && dataSet[endIndex].start.id != endEl.id) {
                     _.extend(end, _.pick(V(endEl).bbox(), 'x', 'y'), {id: endEl.id});
                     _.extend(dataSet[endIndex], {end, el, endEl});
-                    
+
                     this.watchLink(endIndex);
                 } else {
                     dataSet.pop();
@@ -99,7 +100,7 @@ export default {
             }
         },
 
-        //watch&follow related pointed  changed 
+        //watch&follow related pointed  changed
         updateEventTurn: function() {
             this.eventTurn = this.eventTurn ? false : true;
         },
@@ -143,7 +144,7 @@ export default {
             this[SET_CODE_KEY](item ? item.id : null);
         },
 
-        //UX function 
+        //UX function
         displayTool: function(e) {
             const root = utils.findParentByName(e.target, this.rootName);
             utils.setToolDisplay(root, this.boxName, "block");
@@ -154,7 +155,7 @@ export default {
         }
     },
     created: function() {
-        this[SET_ROOT_METHOD](this.changeRoot);        
+        this[SET_ROOT_METHOD](this.changeRoot);
         this[SET_LINK_METHOD](this.linkRoot);
     },
     mounted() {
@@ -164,15 +165,15 @@ export default {
         $(this.$el).droppable({
             accept: 'svg',
             drop: (e, ui) => {
-                //cleanup all id, to avoid repeat. 
+                //cleanup all id, to avoid repeat.
                 utils.cleanRootAllId(ui.helper[0]);
 
                 const point = V(this.svg).toLocalPoint(ui.position.left, ui.position.top);
                 const vel = V(ui.helper[0].querySelector(utils.wrapNameSelector(this.rootName)));
 
                 vel.translate(~~point.x, ~~point.y);
-                utils.setToolDisplay(vel.node, this.signName, "none"); 
-                utils.setToolDisplay(vel.node, this.boxName, "block"); 
+                utils.setToolDisplay(vel.node, this.signName, "none");
+                utils.setToolDisplay(vel.node, this.boxName, "block");
                 this.gStates.appendChild(vel.node);
             }
         });
@@ -183,7 +184,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div :id="paletteId">
         <svg class="sketch" @mousemove="moveComponent" @mouseup="removeComponent" @mousedown="chooseComponent" @mouseover="displayTool"
             @mouseout="hideTool">
             <g></g>

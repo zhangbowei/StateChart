@@ -1,19 +1,65 @@
 <script>
+import { mapActions } from 'vuex';
+import { mapState } from 'vuex';
+import { ADD_CARD_DATASET} from 'store/card';
+import { wrapIdSelector } from "../utils";
+import { makeUniComponent, registerComponent } from "../utils/reuse";
 import Collapse from './collapse';
 
 export default {
-  props: ['data'],
-  data() {
-    return {
-      isExpand: true
+    props: ['data'],
+    data() {
+        return {
+            isExpand: true
+        }
+    },
+    components: { Collapse },
+    computed: mapState({
+        storageKey: state => state.save.storageKey,
+        paletteId: state => state.save.paletteId,
+        name: state => state.save.name,
+        introduction: state => state.save.introduction,
+        component: state => state.save.component,
+        content: state => state.save.content
+    }),
+    methods: {
+        ...mapActions([ADD_CARD_DATASET]),
+
+        activeChange(value) {
+            this.isExpand = value;
+        },
+        formData() {
+            const domArr = Array.from(this.$el.querySelectorAll('[name]'));
+            return domArr.reduce(function (prev, item) {
+                prev[item.name] = item.value.trim();
+                return prev;
+            }, {});
+        },
+        assembleData() {
+            const data = this.formData();
+            const content = document.querySelector(wrapIdSelector(this.paletteId)).innerHTML;
+
+            data[this.content] = content;
+            data[this.component] = makeUniComponent(Date.now());
+
+            return data;
+        },
+        registerComponent(data) {
+            // this[ADD_CARD_DATASET](data);
+        },
+        saveComponent(data) {
+            let dataset = JSON.parse(localStorage.getItem(this.storageKey));
+
+            dataset = Array.isArray(dataset) ? dataset : [];
+            localStorage.setItem(this.storageKey, JSON.stringify(dataset.concat([data])));
+        },
+        applyProduct() {
+            const data = this.assembleData();
+
+            this.saveComponent(data);
+            this.registerComponent(data);
+        }
     }
-  },
-  components: { Collapse},
-  methods: {
-    activeChange(value) {
-      this.isExpand = value;
-    }
-  }
 
 };
 </script>
@@ -21,12 +67,12 @@ export default {
 <template>
     <li class='container' v-bind:class="{containerExpand: isExpand}">
         <Collapse :data="{isExpand: true, name: this.data.name}" v-on:activeSwitch="activeChange"></Collapse>
-        <a class='entypo-upload' href="javascript:void(0)">保存</a>
+        <a class='entypo-upload' href="javascript:void(0)" v-on:click="applyProduct">保存</a>
         <section class="content">
-            <label class='entypo-doc-text-inv'>名称</label>
-            <textarea name="name"></textarea>
-            <label class='entypo-doc-text'>说明</label>
-            <textarea name="introduction"></textarea>
+            <label class='entypo-credit-card'>名称</label>
+            <textarea :name="name"></textarea>
+            <label class='entypo-vcard'>说明</label>
+            <textarea :name="introduction"></textarea>
         </section>
     </li>
 </template>
