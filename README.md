@@ -354,3 +354,94 @@ for(let i in state.code.datasets) {
 最终全部使用了codepen本身的配套js, css. (即prism.js 0.0.4)
 
 使用prism.js 最新的（2017-1-8 没找到官网的版本号) TAB可能产生错位。
+
+## 动态注册组件(watch computed created mounted先后顺序)
+
+> 问题：需要使用watch的newVal和oldVal，但多次在watch中动态注册组件无效
+
+描述：根据周期图，created前computed和watch都已注册，那为什么mounted执行时，watch组件还没注册？我们来看看顺序：
+
+代码：
+
+```
+    created: function () {
+        this[INIT_CARD_DATASET](this.storageKey);
+        console.log('created');
+    },
+    mounted: function() {
+        console.log('mounted');
+    }
+```
+
+输出：
+
+```
+computed
+List.vue:52 created
+List.vue:32 computed
+
+vue.js:564 [Vue warn]: Unknown custom element: <QRlxHZshUB1494591394186> - did you register the component correctly? For recursive components, make sure to provide the "name" option. //各种组件未注册错误
+
+List.vue:55 mounted
+List.vue:43 watch
+```
+
+分析：可见created中更改监测变量的值后，watch在mounted之后才运行，computed顺序正常。
+
+> 方案：改在mounted内更改监测变量的值。
+
+代码：
+
+```
+    mounted: function() {
+        console.log('mounted');
+        this[INIT_CARD_DATASET](this.storageKey);
+    },
+    beforeUpdate: function() {
+        console.log('beforUpdate');
+    }
+```
+
+输出：(这次没有报错)
+
+```
+computed
+List.vue:51 mounted
+List.vue:32 computed
+List.vue:43 watch
+List.vue:55 beforUpdate
+```
+
+分析：watch在beforeUpdate之前运行，OK了。
+### viewBBox捕捉缩放
+
+**最初实现时，不知道有viewBBox，自己辛辛苦苦手动根据getBBox的返回值算比例，唉~**
+
+> 使用原生存在的问题：
+
+红框框的位移，费解。。。(`不知道杂计算这个值`)(**可能也是由于这个问题才出现viewBox,preserveAspectRatio接口的**)
+
+![img](https://segmentfault.com/image?src=https://ww2.sinaimg.cn/large/006tNc79ly1ffjvx7spgnj30nq05o74s.jpg&objectId=1330000006906507&token=81c5b1a669d1cd3abb1445676b8ab715)
+
+![img](https://segmentfault.com/image?src=https://ww3.sinaimg.cn/large/006tNc79ly1ffjvypo8ukj30za0h079o.jpg&objectId=1330000006906507&token=1d65dc2619b7fbaaa6c61f148ecf576e)
+
+![img](https://segmentfault.com/image?src=https://ww2.sinaimg.cn/large/006tNc79ly1ffjw23emp5j30z00qejxw.jpg&objectId=1330000006906507&token=fa4053de767f9dfd0d22134042b8d294)
+
+> 使用原生(**没成**)
+
+```
+const ratio = calculateSizeRatio(bbox, {height: 60, width: 60});
+const width = bbox.x + bbox.width;
+const height = bbox.y + bbox.height;
+
+vel.attr('style', ['width:', width, 'px;', ' height:', height, 'px;'].join(''));
+vel.scale(ratio.width, ratio.height);
+vel.translate(-(bbox.x*ratio.width+vel.node.offsetX), -(bbox.y*ratio.height+vel.node.offsetY));
+```
+
+> 使用viewBBox
+
+```
+ vel.attr('style', ['width:', '60', 'px;', ' height:', '60', 'px;'].join(''));
+ vel.attr('viewBox', view)
+```

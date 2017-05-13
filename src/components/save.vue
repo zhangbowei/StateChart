@@ -3,7 +3,7 @@ import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { ADD_CARD_DATASET} from 'store/card';
 import { wrapIdSelector } from "../utils";
-import { makeUniComponent, registerComponent } from "../utils/reuse";
+import { makeUniComponent} from "../utils/reuse";
 import Collapse from './collapse';
 
 export default {
@@ -17,10 +17,10 @@ export default {
     computed: mapState({
         storageKey: state => state.save.storageKey,
         paletteId: state => state.save.paletteId,
-        name: state => state.save.name,
-        introduction: state => state.save.introduction,
-        component: state => state.save.component,
-        content: state => state.save.content
+        name: state => state.card.keyObj.name,
+        introduction: state => state.card.keyObj.introduction,
+        component: state => state.card.keyObj.component,
+        content: state => state.card.keyObj.content
     }),
     methods: {
         ...mapActions([ADD_CARD_DATASET]),
@@ -45,7 +45,7 @@ export default {
             return data;
         },
         registerComponent(data) {
-            // this[ADD_CARD_DATASET](data);
+            this[ADD_CARD_DATASET](data);
         },
         saveComponent(data) {
             let dataset = JSON.parse(localStorage.getItem(this.storageKey));
@@ -56,8 +56,8 @@ export default {
         applyProduct() {
             const data = this.assembleData();
 
-            this.saveComponent(data);
             this.registerComponent(data);
+            this.saveComponent(data);
         }
     }
 

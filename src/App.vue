@@ -41,6 +41,8 @@ export default {
             width: 20%;
             height: 100%;
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
         .workspace {
             width: 60%;
