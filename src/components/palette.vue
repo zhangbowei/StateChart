@@ -40,7 +40,7 @@ export default {
         rootName: state => state.tool.root.name,
         signName: state => state.tool.sign.name,
         pathName: state => state.tool.path.name,
-        paletteId: state => state.save.paletteId
+        paletteId: state => state.market.paletteId
     }),
     methods: {
         ...mapActions([SET_ROOT_METHOD, SET_LINK_METHOD, SET_CODE_KEY]),

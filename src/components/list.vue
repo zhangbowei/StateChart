@@ -3,11 +3,12 @@ import Vue from 'vue';
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { INIT_CARD_DATASET } from 'store/card';
-import { wrapIdSelector } from "../utils";
-import { convertStrToDom, calculateSizeRatio, parseSVGBBox} from "../utils/reuse";
+import { wrapIdSelector, wrapNameSelector } from "../utils";
+import { convertStrToDom, calculateSizeRatio, parseSVGBBox, formatSVGStrToHTML } from "../utils/reuse";
 import Region from './region';
 import StateStart from './stateStart';
 import StateEnd from './stateEnd';
+import PointLink from './pointLink';
 import Introduction from './introduction';
 
 export default {
@@ -23,31 +24,46 @@ export default {
 					helper: 'clone'
 				});
 			}
+		},
+		tag: {
+			bind(el, binding) {
+				const rawObj = binding.value;
+
+				$(el).find(rawObj.selector).first().attr(rawObj.tag, rawObj.name);
+			}
 		}
 	},
-	components: { Region, StateStart, StateEnd, Introduction },
+	components: { Region, StateStart, StateEnd, PointLink, Introduction },
 	methods: {
 		...mapActions([INIT_CARD_DATASET]),
 		formatRawComponent(contentStr) {
-			const rawStr = contentStr.replace(/svg.*?class=".*?">/, function (all) {
-				return all.replace(/class=".*?"/, '');
-			});
+			const svgStr = formatSVGStrToHTML(JSON.parse(contentStr), { tag: this.componentTag, el: this.$el });
 			const palette = document.querySelector(wrapIdSelector(this.paletteId));
-			const vel = V(convertStrToDom(rawStr).querySelector('svg'));
+			const vel = V(convertStrToDom(svgStr).querySelector('svg'));
 			const bbox = parseSVGBBox(palette, vel.node);
 			const view = [bbox.x, bbox.y, bbox.width, bbox.height].join();
 
-    		vel.attr('style', ['width:', '60', 'px;', ' height:', '60', 'px;'].join(''));
+			vel.attr('style', ['width:', '60', 'px;', ' height:', '60', 'px;'].join(''));
 			vel.attr('viewBox', view);
 			vel.attr('preserveAspectRatio', 'none');
 
 			return vel.node.outerHTML;
+		},
+		productComponentConf(name) {
+			return {
+				selector: wrapNameSelector(this.rootName),
+				tag: this.componentTag,
+				name: name
+			};
 		}
 	},
 	computed: mapState({
 		datasets: state => state.card.datasets.filter(data => data.name.includes(state.card.filterKey)),
-        paletteId: state => state.save.paletteId,
-		storageKey: state => state.save.storageKey,
+		rootName: state => state.tool.root.name,
+		paletteId: state => state.market.paletteId,
+		listId: state => state.market.listId,
+		storageKey: state => state.market.storageKey,
+		componentTag: state => state.market.componentTag,
 		component: state => state.card.keyObj.component,
 		content: state => state.card.keyObj.content
 	}),
@@ -55,9 +71,8 @@ export default {
 		datasets: function (newArr, oldArr) {
 			const len = newArr.length - oldArr.length;
 			const diffArr = newArr.slice(-len);
-
 			diffArr.forEach((item) => {
-				Vue.component(item[this.component], { template: this.formatRawComponent(item[this.content])});
+				Vue.component(item[this.component], { template: this.formatRawComponent(item[this.content]) });
 			});
 		}
 	},
@@ -68,7 +83,7 @@ export default {
 </script>
 
 <template>
-	<div class="wrapper" :class="{'list-mode': convert}">
+	<div :id="listId" class="wrapper" :class="{'list-mode': convert}">
 		<header>
 			<a href="javascript:void(0)" class="hide-list" @click="convert=false">
 				<i class="fa fa-th"></i>
@@ -79,7 +94,7 @@ export default {
 		</header>
 		<div class="container">
 			<div class="box" v-for="item in datasets">
-				<div :is="item.component" v-drag></div>
+				<div :is="item.component" v-drag v-tag="productComponentConf(item.component)"></div>
 				<Introduction v-if="convert" :content="item"></Introduction>
 			</div>
 		</div>
@@ -146,7 +161,11 @@ header a.hide-list {
 	overflow-y: scroll;
 	flex: 1;
 }
-
+.wrapper .mat {
+	width: 0px;
+	height: 0px;
+	visibility: hidden;
+}
 .wrapper .box {
 	float: left;
 	overflow: hidden;

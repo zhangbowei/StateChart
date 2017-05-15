@@ -1,36 +1,59 @@
 <script>
 import Tag from "./tag";
 import { mapState } from 'vuex';
-import {getAngle, makeMouseFirst} from "../utils";
+import { getAngle, makeMouseFirst } from "../utils";
 
 export default {
-    components: { Tag},
-    props: ['data'], 
+    components: { Tag },
+    props: {
+        'data': {
+            type: Object,
+            default: function () {
+                return { start: {x:0, y:0}, end: {x:0, y:0}};
+            }
+        }
+    },
     data() {
         return {
             arrow: undefined
         }
     },
+	directives: {
+		tag: {
+			componentUpdated(el, binding) {
+				const rawObj = binding.value;
+
+				$(el).attr(rawObj.tag, JSON.stringify(rawObj.data));
+			}
+		}
+    },
     computed: mapState({
-        pathD: function() {
+        processedData: function() {
             const start = this.data.start;
             const end = makeMouseFirst(this.data);
+
+            return {start, end};
+        },
+        pathD: function () {
+            const start = this.processedData.start;
+            const end = this.processedData.end;
             return ['M', start.x, start.y, 'L', end.x, end.y].join(' ');
         },
-        arrowD: function() {
+        arrowD: function () {
             const data = this.data.end;
             const x = data.x;
             const y = data.y;
-            return ['M', x, y, 'L', x-14, y-6, 'L', x-14, y+6, 'z'].join(' ');
+            return ['M', x, y, 'L', x - 14, y - 6, 'L', x - 14, y + 6, 'z'].join(' ');
         },
-        id: function() {
+        id: function () {
             return [this.data.start.id, this.data.end.id].join('_');
         },
-        pathName: state => state.tool.path.name
+        pathName: state => state.tool.path.name,
+        lineTag: state => state.market.lineTag
     }),
     watch: {
-        pathD: function() {
-            V(this.arrow).rotate(getAngle(this.data), this.data.end.x, this.data.end.y, {absolute: true});
+        pathD: function () {
+            V(this.arrow).rotate(getAngle(this.data), this.data.end.x, this.data.end.y, { absolute: true });
         }
     },
     mounted() {
@@ -41,20 +64,21 @@ export default {
 
 <template>
     <g :name="pathName" :id="id">
-        <path class="link" :d="pathD"></path>
+        <path class="link" :d="pathD" v-tag="{tag: lineTag, data: processedData}"></path>
         <path class="arrow" :d="arrowD"></path>
         <Tag data="Transition"></Tag>
     </g>
 </template>
 
 <style scoped lang="less">
-    .link {
-        cursor: pointer;
-        opacity: 0.8;
-        stroke: #333333;
-        stroke-width: 3;
-    }
-    .arrow{
-        fill: #333333;
-    }
+.link {
+    cursor: pointer;
+    opacity: 0.8;
+    stroke: #333333;
+    stroke-width: 3;
+}
+
+.arrow {
+    fill: #333333;
+}
 </style>

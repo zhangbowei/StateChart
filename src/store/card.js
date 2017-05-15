@@ -30,7 +30,6 @@ const keyObj = keyArr.reduce(function(prev, item) {
 const store = {
     state: {
         keyObj,
-        // 会话列表
         datasets: datasets,
         // 过滤出只包含这个key的会话
         filterKey: ''

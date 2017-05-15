@@ -445,3 +445,10 @@ vel.translate(-(bbox.x*ratio.width+vel.node.offsetX), -(bbox.y*ratio.height+vel.
  vel.attr('style', ['width:', '60', 'px;', ' height:', '60', 'px;'].join(''));
  vel.attr('viewBox', view)
 ```
+## [vue组件标签页中 data-v-6542a5cf值是如何生成的 ？](https://segmentfault.com/q/1010000009421651?_ea=1923585)
+
+生成过程和 `文件路径文件名`有关，所以不能拿来直接用。(具体看源码)
+
+ps: [process.cwd()](https://segmentfault.com/q/1010000004951523/a-1020000004953950)
+
+> 因此，为了始终适配项目变更，data-v的值不能直接使用。

@@ -3,7 +3,7 @@ import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { ADD_CARD_DATASET} from 'store/card';
 import { wrapIdSelector } from "../utils";
-import { makeUniComponent} from "../utils/reuse";
+import { makeUniComponent, formatSVGHtmlToStr} from "../utils/reuse";
 import Collapse from './collapse';
 
 export default {
@@ -15,8 +15,12 @@ export default {
     },
     components: { Collapse },
     computed: mapState({
-        storageKey: state => state.save.storageKey,
-        paletteId: state => state.save.paletteId,
+        rootName: state => state.tool.root.name,
+        pathName: state => state.tool.path.name,
+        storageKey: state => state.market.storageKey,
+        paletteId: state => state.market.paletteId,
+        componentTag: state => state.market.componentTag,
+        lineTag: state => state.market.lineTag,
         name: state => state.card.keyObj.name,
         introduction: state => state.card.keyObj.introduction,
         component: state => state.card.keyObj.component,
@@ -37,9 +41,10 @@ export default {
         },
         assembleData() {
             const data = this.formData();
-            const content = document.querySelector(wrapIdSelector(this.paletteId)).innerHTML;
+            const palette = document.querySelector(wrapIdSelector(this.paletteId));
+            const nameArr = [this.rootName, this.pathName];
 
-            data[this.content] = content;
+            data[this.content] = formatSVGHtmlToStr(palette, nameArr, this.lineTag);
             data[this.component] = makeUniComponent(Date.now());
 
             return data;
