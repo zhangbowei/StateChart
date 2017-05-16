@@ -25,18 +25,22 @@ export default {
 
 				$(el).attr(rawObj.tag, JSON.stringify(rawObj.data));
 			}
-		}
+		},
+        rotate: {
+            inserted(el, binding) {
+                const data = binding.value;
+                V(el).rotate(getAngle(data), data.end.x, data.end.y, { absolute: true });
+            },
+            update(el, binding) {
+                const data = binding.value;
+                V(el).rotate(getAngle(data), data.end.x, data.end.y, { absolute: true });
+            }
+        }
     },
     computed: mapState({
-        processedData: function() {
+        pathD: function () {
             const start = this.data.start;
             const end = makeMouseFirst(this.data);
-
-            return {start, end};
-        },
-        pathD: function () {
-            const start = this.processedData.start;
-            const end = this.processedData.end;
             return ['M', start.x, start.y, 'L', end.x, end.y].join(' ');
         },
         arrowD: function () {
@@ -50,22 +54,14 @@ export default {
         },
         pathName: state => state.tool.path.name,
         lineTag: state => state.market.lineTag
-    }),
-    watch: {
-        pathD: function () {
-            V(this.arrow).rotate(getAngle(this.data), this.data.end.x, this.data.end.y, { absolute: true });
-        }
-    },
-    mounted() {
-        this.arrow = this.$el.querySelector('.arrow');
-    }
+    })
 };
 </script>
 
 <template>
     <g :name="pathName" :id="id">
-        <path class="link" :d="pathD" v-tag="{tag: lineTag, data: processedData}"></path>
-        <path class="arrow" :d="arrowD"></path>
+        <path class="link" :d="pathD" v-tag="{tag: lineTag, data}"></path>
+        <path class="arrow" :d="arrowD" v-rotate="data"></path>
         <Tag data="Transition"></Tag>
     </g>
 </template>

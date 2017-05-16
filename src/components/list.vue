@@ -4,11 +4,11 @@ import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { INIT_CARD_DATASET } from 'store/card';
 import { wrapIdSelector, wrapNameSelector } from "../utils";
-import { convertStrToDom, calculateSizeRatio, parseSVGBBox, formatSVGStrToHTML } from "../utils/reuse";
+import reuse from "../utils/reuse";
 import Region from './region';
 import StateStart from './stateStart';
 import StateEnd from './stateEnd';
-import PointLink from './pointLink';
+import pointlink from './pointLink';
 import Introduction from './introduction';
 
 export default {
@@ -33,14 +33,20 @@ export default {
 			}
 		}
 	},
-	components: { Region, StateStart, StateEnd, PointLink, Introduction },
+	components: { Region, StateStart, StateEnd, Introduction },
 	methods: {
 		...mapActions([INIT_CARD_DATASET]),
 		formatRawComponent(contentStr) {
-			const svgStr = formatSVGStrToHTML(JSON.parse(contentStr), { tag: this.componentTag, el: this.$el });
+			const svgStr = reuse.formatSVGStrToHTML(contentStr, {
+				componentTag: this.componentTag,
+				lineTag: this.lineTag,
+				el: this.$el,
+				productLink: (data) => ['<pointlink :data=', data, '></pointlink>'].join('')
+			 });
 			const palette = document.querySelector(wrapIdSelector(this.paletteId));
-			const vel = V(convertStrToDom(svgStr).querySelector('svg'));
-			const bbox = parseSVGBBox(palette, vel.node);
+			const vel = V(reuse.convertStrToDom(svgStr).querySelector('svg'));
+
+			const bbox = reuse.parseSVGBBox(palette, vel.node);
 			const view = [bbox.x, bbox.y, bbox.width, bbox.height].join();
 
 			vel.attr('style', ['width:', '60', 'px;', ' height:', '60', 'px;'].join(''));
@@ -64,6 +70,7 @@ export default {
 		listId: state => state.market.listId,
 		storageKey: state => state.market.storageKey,
 		componentTag: state => state.market.componentTag,
+        lineTag: state => state.market.lineTag,
 		component: state => state.card.keyObj.component,
 		content: state => state.card.keyObj.content
 	}),
@@ -72,7 +79,10 @@ export default {
 			const len = newArr.length - oldArr.length;
 			const diffArr = newArr.slice(-len);
 			diffArr.forEach((item) => {
-				Vue.component(item[this.component], { template: this.formatRawComponent(item[this.content]) });
+				Vue.component(item[this.component], {
+					template: this.formatRawComponent(item[this.content]),
+					components: { pointlink }
+				});
 			});
 		}
 	},
@@ -161,11 +171,13 @@ header a.hide-list {
 	overflow-y: scroll;
 	flex: 1;
 }
+
 .wrapper .mat {
 	width: 0px;
 	height: 0px;
 	visibility: hidden;
 }
+
 .wrapper .box {
 	float: left;
 	overflow: hidden;

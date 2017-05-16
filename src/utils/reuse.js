@@ -22,15 +22,6 @@ export function convertStrToDom(content) {
     return dom;
 }
 
-export function calculateSizeRatio(realObj, ruleObj) {
-    const res = {};
-    for (let key in ruleObj) {
-        res[key] = ruleObj[key] / (realObj[key] === 0 ? NaN : realObj[key]);
-    }
-
-    return res;
-}
-
 export function parseSVGBBox(paletteDom, svgDom) {
     let bbox;
 
@@ -56,7 +47,7 @@ export function formatSVGHtmlToStr(palette, domNameArr, lineTag) {
     function processLinkData(el, tag) {
         const dom = el.querySelector(['[', tag, ']'].join(''));
 
-        return dom ?  dom.getAttribute(tag) : null;
+        return dom ? dom.getAttribute(tag) : null;
     }
 
     const nameArr = domNameArr.slice();
@@ -77,20 +68,25 @@ export function formatSVGHtmlToStr(palette, domNameArr, lineTag) {
     return JSON.stringify(res);
 }
 
-export function formatSVGStrToHTML(contentArr, conf) {
-    function processContent(data) {
-        const result = data.reduce(function (prev, item) {
+
+export function formatSVGStrToHTML(contentStr, conf) {
+    function processContent(data,  componentTag, linkTag) {
+        const deepData = JSON.parse(data).reduce(function (prev, item) {
             prev[item.parentId] ? prev[item.parentId].push(item) : prev[item.parentId] = [item];
             return prev;
         }, {});
 
-        for (let key in result) {
-            result[key].forEach(function (item, index) {
-                result[item.id] ? item.children = result[item.id] : [];
+        for (let key in deepData) {
+            deepData[key].forEach(function (item, index) {
+                deepData[item.id] ? item.children = deepData[item.id] : [];
             });
         }
 
-        return result[null];
+        return deepData[null].reduce(function (prev, item) {
+            const key = item[componentTag] ? componentTag : linkTag;
+            prev[key] ? prev[key].push(item) : prev[key] = [item];
+            return prev;
+        }, {});
     }
     function initDOM(dom, option) {
         for (let key in option) {
@@ -124,25 +120,41 @@ export function formatSVGStrToHTML(contentArr, conf) {
         return dom.children[0];
     }
 
-    const tag = conf.tag;
+    const componentTag = conf.componentTag;
+    const lineTag = conf.lineTag;
     const el = conf.el;
-    const baseHTML = parseBaseComponent(el, tag);
-    const deepContent = processContent(contentArr);
+    const productLink = conf.productLink;
+    const content = processContent(contentStr, componentTag, lineTag);
+    const baseHTML = parseBaseComponent(el, componentTag);
     const svg = document.createElement('svg');
-    const exclKey = ['children', 'parentId', tag];
-    const createSvgDom = function (confArr, parent) {
+    const exclKey = ['children', 'parentId', componentTag];
+    const addComponentDom = function (confArr, parent) {
         if (!Array.isArray(confArr)) return;
         confArr.forEach(function (item) {
-            if (item[tag] !== void 0) {
-                const el = strToDom(baseHTML[item[tag]]);
-                initDOM(el, filterObj(item, exclKey));
-                parent.appendChild(el);
-                createSvgDom(item.children, el);
-            }
+            const el = strToDom(baseHTML[item[componentTag]]);
+            initDOM(el, filterObj(item, exclKey));
+            parent.appendChild(el);
+            addComponentDom(item.children, el);
+        });
+    };
+    const addLinkDom = function (confArr, parent) {
+        if (!Array.isArray(confArr)) return;
+        confArr.forEach(function (item) {
+            const el = strToDom(productLink(item[lineTag]));
+            parent.appendChild(el);
         });
     }
 
-    createSvgDom(deepContent, svg);
+    addComponentDom(content[componentTag], svg);
+    addLinkDom(content[lineTag], svg);
 
     return svg.outerHTML;
 }
+
+const reuse = {
+    convertStrToDom,
+    parseSVGBBox,
+    formatSVGStrToHTML
+};
+
+export default reuse;
