@@ -3,18 +3,18 @@ import Vue from 'vue';
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { INIT_CARD_DATASET } from 'store/card';
-import { wrapIdSelector, wrapNameSelector } from "../utils";
-import reuse from "../utils/reuse";
+import { parseSVGBBox, formatSVGStrToHtml } from "../utils/reuse";
 import Region from './region';
 import StateStart from './stateStart';
 import StateEnd from './stateEnd';
-import pointlink from './pointLink';
+import PointLink from './pointLink';
 import Introduction from './introduction';
 
 export default {
 	data() {
 		return {
-			convert: true
+			convert: true,
+			path: undefined
 		};
 	},
 	directives: {
@@ -28,39 +28,36 @@ export default {
 		tag: {
 			bind(el, binding) {
 				const rawObj = binding.value;
+				const dom = el.querySelector(['[name=', rawObj.root, ']'].join(''));
 
-				$(el).find(rawObj.selector).first().attr(rawObj.tag, rawObj.name);
+				dom.getAttribute(rawObj.tag) ? null : dom.setAttribute(rawObj.tag, rawObj.name);
 			}
 		}
 	},
 	components: { Region, StateStart, StateEnd, Introduction },
 	methods: {
 		...mapActions([INIT_CARD_DATASET]),
-		formatRawComponent(contentStr) {
-			const svgStr = reuse.formatSVGStrToHTML(contentStr, {
-				componentTag: this.componentTag,
-				lineTag: this.lineTag,
-				el: this.$el,
-				productLink: (data) => ['<pointlink :data=', data, '></pointlink>'].join('')
-			 });
-			const palette = document.querySelector(wrapIdSelector(this.paletteId));
-			const vel = V(reuse.convertStrToDom(svgStr).querySelector('svg'));
-
-			const bbox = reuse.parseSVGBBox(palette, vel.node);
-			const view = [bbox.x, bbox.y, bbox.width, bbox.height].join();
-
-			vel.attr('style', ['width:', '60', 'px;', ' height:', '60', 'px;'].join(''));
-			vel.attr('viewBox', view);
-			vel.attr('preserveAspectRatio', 'none');
-
-			return vel.node.outerHTML;
-		},
 		productComponentConf(name) {
 			return {
-				selector: wrapNameSelector(this.rootName),
+				root: this.rootName,
 				tag: this.componentTag,
 				name: name
 			};
+		},
+		productCombComponent(contentStr, productLink) {
+			const svg = formatSVGStrToHtml(contentStr, {
+				componentTag: this.componentTag,
+				lineTag: this.lineTag,
+				list: this.$el,
+				productLink
+			});
+			const bbox = parseSVGBBox(this.paletteId, svg);
+
+			svg.setAttribute('style', ['width:', '60', 'px;', ' height:', '60', 'px;'].join(''));
+			svg.setAttribute('viewBox', [bbox.x, bbox.y, bbox.width, bbox.height].join());
+			svg.setAttribute('preserveAspectRatio', 'none');
+
+			return svg.outerHTML.replace(/<!--(.*?)-->/, (all, item) => item);
 		}
 	},
 	computed: mapState({
@@ -70,18 +67,20 @@ export default {
 		listId: state => state.market.listId,
 		storageKey: state => state.market.storageKey,
 		componentTag: state => state.market.componentTag,
-        lineTag: state => state.market.lineTag,
+		lineTag: state => state.market.lineTag,
 		component: state => state.card.keyObj.component,
 		content: state => state.card.keyObj.content
 	}),
 	watch: {
 		datasets: function (newArr, oldArr) {
+			function productLink(data) { return ["<PointLink :data='", data, "'></PointLink>"].join(''); }
+
 			const len = newArr.length - oldArr.length;
 			const diffArr = newArr.slice(-len);
 			diffArr.forEach((item) => {
 				Vue.component(item[this.component], {
-					template: this.formatRawComponent(item[this.content]),
-					components: { pointlink }
+					template: this.productCombComponent(item[this.content], productLink),
+					components: { PointLink }
 				});
 			});
 		}
@@ -170,12 +169,6 @@ header a.hide-list {
 	margin: 10px 0px;
 	overflow-y: scroll;
 	flex: 1;
-}
-
-.wrapper .mat {
-	width: 0px;
-	height: 0px;
-	visibility: hidden;
 }
 
 .wrapper .box {

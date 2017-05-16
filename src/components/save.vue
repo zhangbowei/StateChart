@@ -15,8 +15,6 @@ export default {
     },
     components: { Collapse },
     computed: mapState({
-        rootName: state => state.tool.root.name,
-        pathName: state => state.tool.path.name,
         storageKey: state => state.market.storageKey,
         paletteId: state => state.market.paletteId,
         componentTag: state => state.market.componentTag,
@@ -42,9 +40,11 @@ export default {
         assembleData() {
             const data = this.formData();
             const palette = document.querySelector(wrapIdSelector(this.paletteId));
-            const nameArr = [this.rootName, this.pathName];
 
-            data[this.content] = formatSVGHtmlToStr(palette, nameArr, this.lineTag);
+            data[this.content] = formatSVGHtmlToStr(palette, {
+				componentTag: this.componentTag,
+				lineTag: this.lineTag
+            });
             data[this.component] = makeUniComponent(Date.now());
 
             return data;

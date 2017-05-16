@@ -13,29 +13,13 @@ export default {
             }
         }
     },
-    data() {
-        return {
-            arrow: undefined
-        }
-    },
 	directives: {
 		tag: {
 			componentUpdated(el, binding) {
 				const rawObj = binding.value;
-
 				$(el).attr(rawObj.tag, JSON.stringify(rawObj.data));
 			}
-		},
-        rotate: {
-            inserted(el, binding) {
-                const data = binding.value;
-                V(el).rotate(getAngle(data), data.end.x, data.end.y, { absolute: true });
-            },
-            update(el, binding) {
-                const data = binding.value;
-                V(el).rotate(getAngle(data), data.end.x, data.end.y, { absolute: true });
-            }
-        }
+		}
     },
     computed: mapState({
         pathD: function () {
@@ -52,6 +36,11 @@ export default {
         id: function () {
             return [this.data.start.id, this.data.end.id].join('_');
         },
+        rotate: function() {
+            const data = this.data;
+            const configure = [getAngle(data), data.end.x, data.end.y].join();
+            return ['rotate(', configure,')'].join('');
+        },
         pathName: state => state.tool.path.name,
         lineTag: state => state.market.lineTag
     })
@@ -61,7 +50,7 @@ export default {
 <template>
     <g :name="pathName" :id="id">
         <path class="link" :d="pathD" v-tag="{tag: lineTag, data}"></path>
-        <path class="arrow" :d="arrowD" v-rotate="data"></path>
+        <path class="arrow" :d="arrowD" :transform="rotate"></path>
         <Tag data="Transition"></Tag>
     </g>
 </template>
