@@ -4,7 +4,7 @@ const store = {
         listId: 'counter',
         //this(behind) following keys' value must not be Changed
         storageKey: 'dataset',
-        componentTag: 'data-component',
+        moduleTag: 'data-module',
         lineTag: 'data-line'
     }
 };

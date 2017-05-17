@@ -2,11 +2,21 @@ export const SET_CARD_KEY = 'SET_CARD_KEY';
 export const INIT_CARD_DATASET = 'INIT_DATASET';
 export const ADD_CARD_DATASET = 'ADD_DATASET';
 
-const keyArr = ['name', 'component', 'introduction', 'content'];
+//moduleAndComp map list.vue Component Name(import * from *) to Avoid variation
+const moduleToComp = new Map([
+    ['C1', 'Region'],
+    ['C2', 'StateStart'],
+    ['C3', 'StateEnd']
+]);
+const convertModuleToComp =  function(data) {
+    return moduleToComp.has(data) ? moduleToComp.get(data) : data;
+}
+
+const keyArr = ['name', 'module', 'introduction', 'content'];
 const dataArr = [
-    ['区域', 'Region', 'testtesttes'],
-    ['起始状态', 'StateStart', 'testtesttes'],
-    ['终止状态', 'StateEnd', 'testtesttes']
+    ['区域', 'C1', 'testtesttes'],
+    ['起始状态', 'C2', 'testtesttes'],
+    ['终止状态', 'C3', 'testtesttes']
 ];
 const parseData = function (data) {
     const rawData = data;
@@ -22,7 +32,7 @@ const datasets = dataArr.reduce(function (stock, good) {
         return box;
     }, {})]);
 }, []);
-const keyObj = keyArr.reduce(function(prev, item) {
+const keyObj = keyArr.reduce(function (prev, item) {
     prev[item] = item;
     return prev;
 }, {});
@@ -30,7 +40,8 @@ const keyObj = keyArr.reduce(function(prev, item) {
 const store = {
     state: {
         keyObj,
-        datasets: datasets,
+        convertModuleToComp,
+        datasets,
         // 过滤出只包含这个key的会话
         filterKey: ''
     },

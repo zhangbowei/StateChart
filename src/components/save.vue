@@ -3,7 +3,7 @@ import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { ADD_CARD_DATASET} from 'store/card';
 import { wrapIdSelector } from "../utils";
-import { makeUniComponent, formatSVGHtmlToStr} from "../utils/reuse";
+import { makeUniModule, formatSVGHtmlToStr} from "../utils/reuse";
 import Collapse from './collapse';
 
 export default {
@@ -17,11 +17,11 @@ export default {
     computed: mapState({
         storageKey: state => state.market.storageKey,
         paletteId: state => state.market.paletteId,
-        componentTag: state => state.market.componentTag,
+        moduleTag: state => state.market.moduleTag,
         lineTag: state => state.market.lineTag,
         name: state => state.card.keyObj.name,
         introduction: state => state.card.keyObj.introduction,
-        component: state => state.card.keyObj.component,
+        module: state => state.card.keyObj.module,
         content: state => state.card.keyObj.content
     }),
     methods: {
@@ -42,17 +42,17 @@ export default {
             const palette = document.querySelector(wrapIdSelector(this.paletteId));
 
             data[this.content] = formatSVGHtmlToStr(palette, {
-				componentTag: this.componentTag,
+				moduleTag: this.moduleTag,
 				lineTag: this.lineTag
             });
-            data[this.component] = makeUniComponent(Date.now());
+            data[this.module] = makeUniModule(Date.now());
 
             return data;
         },
-        registerComponent(data) {
+        registerModule(data) {
             this[ADD_CARD_DATASET](data);
         },
-        saveComponent(data) {
+        saveModule(data) {
             let dataset = JSON.parse(localStorage.getItem(this.storageKey));
 
             dataset = Array.isArray(dataset) ? dataset : [];
@@ -61,8 +61,8 @@ export default {
         applyProduct() {
             const data = this.assembleData();
 
-            this.registerComponent(data);
-            this.saveComponent(data);
+            this.registerModule(data);
+            this.saveModule(data);
         }
     }
 

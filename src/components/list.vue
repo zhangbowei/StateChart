@@ -37,16 +37,16 @@ export default {
 	components: { Region, StateStart, StateEnd, Introduction },
 	methods: {
 		...mapActions([INIT_CARD_DATASET]),
-		productComponentConf(name) {
+		productModuleConf(name) {
 			return {
 				root: this.rootName,
-				tag: this.componentTag,
+				tag: this.moduleTag,
 				name: name
 			};
 		},
 		productCombComponent(contentStr, productLink) {
 			const svg = formatSVGStrToHtml(contentStr, {
-				componentTag: this.componentTag,
+				moduleTag: this.moduleTag,
 				lineTag: this.lineTag,
 				list: this.$el,
 				productLink
@@ -62,13 +62,14 @@ export default {
 	},
 	computed: mapState({
 		datasets: state => state.card.datasets.filter(data => data.name.includes(state.card.filterKey)),
+	    convertModuleToComp: state => state.card.convertModuleToComp,
 		rootName: state => state.tool.root.name,
 		paletteId: state => state.market.paletteId,
 		listId: state => state.market.listId,
 		storageKey: state => state.market.storageKey,
-		componentTag: state => state.market.componentTag,
+		moduleTag: state => state.market.moduleTag,
 		lineTag: state => state.market.lineTag,
-		component: state => state.card.keyObj.component,
+		module: state => state.card.keyObj.module,
 		content: state => state.card.keyObj.content
 	}),
 	watch: {
@@ -78,7 +79,7 @@ export default {
 			const len = newArr.length - oldArr.length;
 			const diffArr = newArr.slice(-len);
 			diffArr.forEach((item) => {
-				Vue.component(item[this.component], {
+				Vue.component(this.convertModuleToComp(item[this.module]), {
 					template: this.productCombComponent(item[this.content], productLink),
 					components: { PointLink }
 				});
@@ -103,7 +104,7 @@ export default {
 		</header>
 		<div class="container">
 			<div class="box" v-for="item in datasets">
-				<div :is="item.component" v-drag v-tag="productComponentConf(item.component)"></div>
+				<div :is="convertModuleToComp(item.module)" v-drag v-tag="productModuleConf(item.module)"></div>
 				<Introduction v-if="convert" :content="item"></Introduction>
 			</div>
 		</div>

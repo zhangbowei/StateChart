@@ -1,4 +1,4 @@
-export function makeUniComponent(timestamp) {
+export function makeUniModule(timestamp) {
     function generateSalt() {
         const set = 'abcdefghijklmnopqurstuvwxyzABCDEFGHIJKLMNOPQURSTUVWXYZ';
         let salt = '';
@@ -40,9 +40,9 @@ export function formatSVGHtmlToStr(palette, conf) {
         return data;
     }
 
-    const componentTag = conf.componentTag;
+    const moduleTag = conf.moduleTag;
     const lineTag = conf.lineTag;
-    const selector = [componentTag, lineTag].slice().reduce(function (prev, item) {
+    const selector = [moduleTag, lineTag].slice().reduce(function (prev, item) {
         return prev.concat([['[', item, ']'].join('')]);
     }, []).join();
     const targetArr = Array.from(palette.querySelectorAll(selector));
@@ -60,7 +60,7 @@ export function formatSVGHtmlToStr(palette, conf) {
 
 
 export function formatSVGStrToHtml(contentStr, conf) {
-    function processContent(data, componentTag, linkTag) {
+    function processContent(data, moduleTag, linkTag) {
         const deepData = JSON.parse(data).reduce(function (prev, item) {
             prev[item.parentId] ? prev[item.parentId].push(item) : prev[item.parentId] = [item];
             return prev;
@@ -73,7 +73,7 @@ export function formatSVGStrToHtml(contentStr, conf) {
         }
 
         return deepData[null].reduce(function (prev, item) {
-            const key = item[componentTag] ? componentTag : linkTag;
+            const key = item[moduleTag] ? moduleTag : linkTag;
             prev[key] ? prev[key].push(item) : prev[key] = [item];
             return prev;
         }, {});
@@ -126,13 +126,13 @@ export function formatSVGStrToHtml(contentStr, conf) {
     }
 
 
-    const componentTag = conf.componentTag;
+    const moduleTag = conf.moduleTag;
     const lineTag = conf.lineTag;
     const list = conf.list;
     const productLink = conf.productLink;
-    const content = processContent(contentStr, componentTag, lineTag);
-    const baseHTML = parseBaseComponent(list, componentTag);
-    const exclKey = ['children', 'parentId', componentTag];
+    const content = processContent(contentStr, moduleTag, lineTag);
+    const baseHTML = parseBaseComponent(list, moduleTag);
+    const exclKey = ['children', 'parentId', moduleTag];
     const res = {};
 
     const integrateComponent = function (confArr) {
@@ -140,7 +140,7 @@ export function formatSVGStrToHtml(contentStr, conf) {
         const setComponent = function (dataArr, parent) {
             if (!Array.isArray(dataArr)) return;
             dataArr.forEach(function (item) {
-                const el = strToDom(baseHTML[item[componentTag]]);
+                const el = strToDom(baseHTML[item[moduleTag]]);
                 initDOM(el, filterObj(item, exclKey));
                 parent.appendChild(el);
                 setComponent(item.children, el);
@@ -159,7 +159,7 @@ export function formatSVGStrToHtml(contentStr, conf) {
         }, '');
     };
 
-    res[componentTag] = integrateComponent(content[componentTag]);
+    res[moduleTag] = integrateComponent(content[moduleTag]);
     res[lineTag] = integrateLink(content[lineTag]);
 
     return processStrToSVG(annotation(res, lineTag));
