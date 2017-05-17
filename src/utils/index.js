@@ -38,16 +38,16 @@ export function getAngle(data) {
         if (height < 0) {
             angle = angle + 180;
         } else {
-            angle = 180 - angle; 
+            angle = 180 - angle;
         }
     } else {
         if (height < 0) {
-            angle = -angle; 
+            angle = -angle;
         } else {
             angle = angle;
         }
     }
-    return angle; 
+    return angle;
 }
 
 export function makeMouseFirst(data, offset) {
@@ -56,8 +56,8 @@ export function makeMouseFirst(data, offset) {
     const width = data.end.x - data.start.x;
     const height= data.end.y - data.start.y;
     const arc = Math.atan2(Math.abs(height), Math.abs(width));
-    let offsetX = offset * Math.cos(arc); 
-    let offsetY = offset * Math.sin(arc); 
+    let offsetX = offset * Math.cos(arc);
+    let offsetY = offset * Math.sin(arc);
     offsetX = width < 0 ? -offsetX : offsetX;
     offsetY = height < 0 ? -offsetY : offsetY;
 
@@ -269,19 +269,9 @@ export function setToolDisplay(nodes, name, display) {
     nodes.forEach(function(node) {
        let el = node.querySelector(wrapNameSelector(name));
        if (el) {
-           el.setAttribute('display', display); 
+           el.setAttribute('display', display);
        }
     });
-}
-
-function cleanRootAllId(el) {
-    let nodes = [el];
-    let len  = nodes.length;
-    for (let i=0; i < len; i++) {
-        nodes[i].setAttribute('id', '');
-        nodes = nodes.concat(Array.prototype.slice.call(nodes[i].children));
-        len = nodes.length;
-    };
 }
 
 const utils = {
@@ -292,8 +282,7 @@ const utils = {
     curryIt,
     findNearContain,
     autoTransformTheRoot,
-    setToolDisplay,
-    cleanRootAllId
+    setToolDisplay
 };
 
 export default utils;

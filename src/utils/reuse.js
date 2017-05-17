@@ -27,7 +27,6 @@ export function parseSVGBBox(paletteId, svgDom) {
     return bbox;
 }
 
-
 export function formatSVGHtmlToStr(palette, conf) {
     function parseAttribute(attribute) {
         const data = {};
@@ -60,6 +59,26 @@ export function formatSVGHtmlToStr(palette, conf) {
 
 
 export function formatSVGStrToHtml(contentStr, conf) {
+    function recurMapDomId(el, tag) {
+        let nodes = [el];
+        let len = nodes.length;
+        const map = new Map();
+        const fn = function (dom) {
+            dom.id = '';
+            if (dom.getAttribute(tag)) {
+                V(dom);
+            }
+            return dom.id;
+        }
+
+        for (let i = 0; i < len; i++) {
+            map.set(nodes[i].getAttribute('id'), fn(nodes[i]));
+            nodes = nodes.concat(Array.prototype.slice.call(nodes[i].children));
+            len = nodes.length;
+        };
+
+        return map;
+    }
     function processContent(data, moduleTag, linkTag) {
         const deepData = JSON.parse(data).reduce(function (prev, item) {
             prev[item.parentId] ? prev[item.parentId].push(item) : prev[item.parentId] = [item];
@@ -124,6 +143,29 @@ export function formatSVGStrToHtml(contentStr, conf) {
 
         return dom.children[0];
     }
+    function integrateComponent(moduleArr, list, tag) {
+        const baseHTML = parseBaseComponent(list, tag);
+        const svg = document.createElement('svg');
+        const setComponent = function (dataArr, parent) {
+            if (!Array.isArray(dataArr)) return;
+            dataArr.forEach(function (item) {
+                const el = strToDom(baseHTML[item[tag]]);
+                initDOM(el, filterObj(item, exclKey));
+                parent.appendChild(el);
+                setComponent(item.children, el);
+            });
+        };
+
+        setComponent(moduleArr, svg);
+
+        return svg.innerHTML;
+    }
+    function integrateLink(lineArr, dataToHtml, updateData) {
+        if (!Array.isArray(lineArr)) return;
+        return lineArr.reduce(function (prev, item) {
+            return prev + dataToHtml(updateData(item[lineTag]));
+        }, '');
+    }
 
 
     const moduleTag = conf.moduleTag;
@@ -131,36 +173,17 @@ export function formatSVGStrToHtml(contentStr, conf) {
     const list = conf.list;
     const productLink = conf.productLink;
     const content = processContent(contentStr, moduleTag, lineTag);
-    const baseHTML = parseBaseComponent(list, moduleTag);
     const exclKey = ['children', 'parentId', moduleTag];
     const res = {};
 
-    const integrateComponent = function (confArr) {
-        const svg = document.createElement('svg');
-        const setComponent = function (dataArr, parent) {
-            if (!Array.isArray(dataArr)) return;
-            dataArr.forEach(function (item) {
-                const el = strToDom(baseHTML[item[moduleTag]]);
-                initDOM(el, filterObj(item, exclKey));
-                parent.appendChild(el);
-                setComponent(item.children, el);
-            });
-        }
+    res[moduleTag] = integrateComponent(content[moduleTag], list, moduleTag);
 
-        setComponent(confArr, svg);
-
-        return svg.innerHTML;
-    };
-
-    const integrateLink = function (confArr) {
-        if (!Array.isArray(confArr)) return;
-        return confArr.reduce(function (prev, item) {
-            return prev + productLink(item[lineTag]);
-        }, '');
-    };
-
-    res[moduleTag] = integrateComponent(content[moduleTag]);
-    res[lineTag] = integrateLink(content[lineTag]);
+    const idMap = recurMapDomId(processStrToSVG(res[moduleTag]), moduleTag);
+    res[lineTag] = integrateLink(content[lineTag], productLink, function (dataStr) {
+        return dataStr.replace(/"id":"(.*?)"/g, function (all, id) {
+            return ['"id":"', idMap.get(id), '"'].join('');
+        })
+    });
 
     return processStrToSVG(annotation(res, lineTag));
 }

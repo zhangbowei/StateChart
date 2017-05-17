@@ -452,3 +452,10 @@ vel.translate(-(bbox.x*ratio.width+vel.node.offsetX), -(bbox.y*ratio.height+vel.
 ps: [process.cwd()](https://segmentfault.com/q/1010000004951523/a-1020000004953950)
 
 > 因此，为了始终适配项目变更，data-v的值不能直接使用。
+
+##module component映射
+本来组件中的data-component是记录list.vue中导入的名称，例如import StateStart form *； 这样存在一个问题，就是后续开发中list.vue中导入的这些名称如果持续变化，那么localStorage中存储的data-component关键字指向的组件名称将作废无法解析；即便说可以通过保证list.vue中import的组件名称不变化，但这中强依赖也是隐形的，是绝对不能被允许的。
+
+最后通过在store中确保module的唯一性，并提供module到component的映射函数解决这一问题。
+##替换ID
+在替换Id过程中，正则优于遍历dom元素。

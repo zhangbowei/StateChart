@@ -15,6 +15,10 @@ export default {
     },
 	directives: {
 		tag: {
+			bind(el, binding) {
+				const rawObj = binding.value;
+				$(el).attr(rawObj.tag, JSON.stringify(rawObj.data));
+			},
 			componentUpdated(el, binding) {
 				const rawObj = binding.value;
 				$(el).attr(rawObj.tag, JSON.stringify(rawObj.data));

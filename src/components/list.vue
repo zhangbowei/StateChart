@@ -3,6 +3,7 @@ import Vue from 'vue';
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { INIT_CARD_DATASET } from 'store/card';
+import { recurMapDomId } from "../utils";
 import { parseSVGBBox, formatSVGStrToHtml } from "../utils/reuse";
 import Region from './region';
 import StateStart from './stateStart';
@@ -62,7 +63,7 @@ export default {
 	},
 	computed: mapState({
 		datasets: state => state.card.datasets.filter(data => data.name.includes(state.card.filterKey)),
-	    convertModuleToComp: state => state.card.convertModuleToComp,
+		convertModuleToComp: state => state.card.convertModuleToComp,
 		rootName: state => state.tool.root.name,
 		paletteId: state => state.market.paletteId,
 		listId: state => state.market.listId,

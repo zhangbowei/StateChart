@@ -165,9 +165,6 @@ export default {
         $(this.$el).droppable({
             accept: 'svg',
             drop: (e, ui) => {
-                //cleanup all id, to avoid repeat.
-                utils.cleanRootAllId(ui.helper[0]);
-
                 const point = V(this.svg).toLocalPoint(ui.position.left, ui.position.top);
                 const vel = V(ui.helper[0].querySelector(utils.wrapNameSelector(this.rootName)));
 

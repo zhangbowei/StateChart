@@ -361,7 +361,7 @@ V = Vectorizer = (function() {
             var matrix = this.node.getTransformToElement(target || this.node.ownerSVGElement);
 
             //fix box bugs by zhangbowei 2017-1-9
-            box.x = 0; 
+            box.x = 0;
             box.y = 0;
 
             return V.transformRect(box, matrix);

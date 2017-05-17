@@ -16,7 +16,7 @@ export default {
         ...mapActions([SET_SCALE_METHOD]),
         scaleRoot(el, e) {
             const vel = V(findParentByName(el, this.rootName));
-            const originaldata = vel.bbox(true); 
+            const originaldata = vel.bbox(true);
             const newdata = vel.bbox();
             const originalScale = {x: (newdata.width + e.movementX)/originaldata.width, y: (newdata.height + e.movementY)/originaldata.height};
             vel.scale(originalScale.x, originalScale.y);
@@ -26,7 +26,7 @@ export default {
         }
     },
     created: function() {
-        this[SET_SCALE_METHOD](this.scaleRoot);        
+        this[SET_SCALE_METHOD](this.scaleRoot);
     }
 };
 </script>
