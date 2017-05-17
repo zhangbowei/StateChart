@@ -27,7 +27,45 @@ export function parseSVGBBox(paletteId, svgDom) {
     return bbox;
 }
 
-export function formatSVGHtmlToStr(palette, conf) {
+export function replaceStrId(dataStr, idMap) {
+    return dataStr.replace(/"id":"(.*?)"/g, function (all, id) {
+        return ['"id":"', idMap.get(id), '"'].join('');
+    });
+}
+
+export function recurMapDomId(elArr) {
+    function resetId(dom) {
+        if (dom.id) {
+            dom.id = '';
+            V(dom);
+        }
+        return dom.id;
+    }
+
+    const nodes = Array.isArray(elArr) ? elArr : [elArr];
+    const map = new Map();
+    const iteratorDom = function (nodes) {
+        nodes.forEach(function (item) {
+            map.set(item.id, resetId(item));
+            iteratorDom(Array.prototype.slice.call(item.children));
+        });
+    };
+
+    iteratorDom(nodes);
+
+    return map;
+}
+
+export function productCombSelector(confArr) {
+    const keyArr = Array.isArray(confArr) ? confArr : [confArr];
+    const selector = keyArr.slice().reduce(function (prev, item) {
+        return prev.concat([['[', item, ']'].join('')]);
+    }, []).join();
+
+    return selector;
+}
+
+export function formatSVGHtmlToStr(domArr) {
     function parseAttribute(attribute) {
         const data = {};
         for (let key in attribute) {
@@ -39,12 +77,7 @@ export function formatSVGHtmlToStr(palette, conf) {
         return data;
     }
 
-    const moduleTag = conf.moduleTag;
-    const lineTag = conf.lineTag;
-    const selector = [moduleTag, lineTag].slice().reduce(function (prev, item) {
-        return prev.concat([['[', item, ']'].join('')]);
-    }, []).join();
-    const targetArr = Array.from(palette.querySelectorAll(selector));
+    const targetArr = Array.from(domArr);
     const res = targetArr.reduce(function (prev, item) {
         const data = parseAttribute(item.attributes);
         const parent = item.parentNode;
@@ -59,28 +92,6 @@ export function formatSVGHtmlToStr(palette, conf) {
 
 
 export function formatSVGStrToHtml(contentStr, conf) {
-    function recurMapDomId(el) {
-        function resetId(dom) {
-            if (dom.id) {
-                dom.id = '';
-                V(dom);
-            }
-            return dom.id;
-        }
-
-        const nodes = [el];
-        const map = new Map();
-        const iteratorDom = function (nodes) {
-            nodes.forEach(function (item) {
-                map.set(item.id, resetId(item));
-                iteratorDom(Array.prototype.slice.call(item.children));
-            });
-        };
-
-        iteratorDom(nodes);
-
-        return map;
-    }
     function processContent(data, moduleTag, linkTag) {
         const deepData = JSON.parse(data).reduce(function (prev, item) {
             prev[item.parentId] ? prev[item.parentId].push(item) : prev[item.parentId] = [item];
@@ -182,9 +193,7 @@ export function formatSVGStrToHtml(contentStr, conf) {
 
     res[moduleTag] = moduleSvg.innerHTML;
     res[lineTag] = integrateLink(content[lineTag], productLink, function (dataStr) {
-        return dataStr.replace(/"id":"(.*?)"/g, function (all, id) {
-            return ['"id":"', idMap.get(id), '"'].join('');
-        })
+        return replaceStrId(dataStr, idMap);
     });
 
     return processStrToSVG(annotation(res, lineTag));

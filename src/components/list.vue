@@ -3,7 +3,6 @@ import Vue from 'vue';
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { INIT_CARD_DATASET } from 'store/card';
-import { recurMapDomId } from "../utils";
 import { parseSVGBBox, formatSVGStrToHtml } from "../utils/reuse";
 import Region from './region';
 import StateStart from './stateStart';
@@ -105,7 +104,7 @@ export default {
 		</header>
 		<div class="container">
 			<div class="box" v-for="item in datasets">
-				<div :is="convertModuleToComp(item.module)" v-drag v-tag="productModuleConf(item.module)"></div>
+				<div class="move" :is="convertModuleToComp(item.module)" v-drag v-tag="productModuleConf(item.module)"></div>
 				<Introduction v-if="convert" :content="item"></Introduction>
 			</div>
 		</div>
@@ -189,5 +188,9 @@ header a.hide-list {
 
 .wrapper.list-mode .box {
 	width: 100%;
+}
+
+.move {
+	cursor: move;
 }
 </style>

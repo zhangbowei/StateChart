@@ -3,7 +3,7 @@ import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { ADD_CARD_DATASET} from 'store/card';
 import { wrapIdSelector } from "../utils";
-import { makeUniModule, formatSVGHtmlToStr} from "../utils/reuse";
+import { makeUniModule, formatSVGHtmlToStr, productCombSelector} from "../utils/reuse";
 import Collapse from './collapse';
 
 export default {
@@ -39,12 +39,10 @@ export default {
         },
         assembleData() {
             const data = this.formData();
-            const palette = document.querySelector(wrapIdSelector(this.paletteId));
+            const selector = productCombSelector([this.moduleTag, this.lineTag]);
+            const domArr = document.querySelector(wrapIdSelector(this.paletteId)).querySelectorAll(selector);
 
-            data[this.content] = formatSVGHtmlToStr(palette, {
-				moduleTag: this.moduleTag,
-				lineTag: this.lineTag
-            });
+            data[this.content] = formatSVGHtmlToStr(domArr);
             data[this.module] = makeUniModule(Date.now());
 
             return data;
