@@ -59,23 +59,25 @@ export function formatSVGHtmlToStr(palette, conf) {
 
 
 export function formatSVGStrToHtml(contentStr, conf) {
-    function recurMapDomId(el, tag) {
-        let nodes = [el];
-        let len = nodes.length;
-        const map = new Map();
-        const fn = function (dom) {
-            dom.id = '';
-            if (dom.getAttribute(tag)) {
+    function recurMapDomId(el) {
+        function resetId(dom) {
+            if (dom.id) {
+                dom.id = '';
                 V(dom);
             }
             return dom.id;
         }
 
-        for (let i = 0; i < len; i++) {
-            map.set(nodes[i].getAttribute('id'), fn(nodes[i]));
-            nodes = nodes.concat(Array.prototype.slice.call(nodes[i].children));
-            len = nodes.length;
+        const nodes = [el];
+        const map = new Map();
+        const iteratorDom = function (nodes) {
+            nodes.forEach(function (item) {
+                map.set(item.id, resetId(item));
+                iteratorDom(Array.prototype.slice.call(item.children));
+            });
         };
+
+        iteratorDom(nodes);
 
         return map;
     }
@@ -158,7 +160,7 @@ export function formatSVGStrToHtml(contentStr, conf) {
 
         setComponent(moduleArr, svg);
 
-        return svg.innerHTML;
+        return svg;
     }
     function integrateLink(lineArr, dataToHtml, updateData) {
         if (!Array.isArray(lineArr)) return;
@@ -174,11 +176,11 @@ export function formatSVGStrToHtml(contentStr, conf) {
     const productLink = conf.productLink;
     const content = processContent(contentStr, moduleTag, lineTag);
     const exclKey = ['children', 'parentId', moduleTag];
+    const moduleSvg = integrateComponent(content[moduleTag], list, moduleTag);
+    const idMap = recurMapDomId(moduleSvg);
     const res = {};
 
-    res[moduleTag] = integrateComponent(content[moduleTag], list, moduleTag);
-
-    const idMap = recurMapDomId(processStrToSVG(res[moduleTag]), moduleTag);
+    res[moduleTag] = moduleSvg.innerHTML;
     res[lineTag] = integrateLink(content[lineTag], productLink, function (dataStr) {
         return dataStr.replace(/"id":"(.*?)"/g, function (all, id) {
             return ['"id":"', idMap.get(id), '"'].join('');
