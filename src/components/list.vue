@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { INIT_CARD_DATASET } from 'store/card';
-import { parseSVGBBox, formatSVGStrToHtml } from "../utils/reuse";
+import { parseSVGBBox, formatSVGStrToHtml, removeAnnotation } from "../utils/reuse";
 import Region from './region';
 import StateStart from './stateStart';
 import StateEnd from './stateEnd';
@@ -57,7 +57,7 @@ export default {
 			svg.setAttribute('viewBox', [bbox.x, bbox.y, bbox.width, bbox.height].join());
 			svg.setAttribute('preserveAspectRatio', 'none');
 
-			return svg.outerHTML.replace(/<!--(.*?)-->/, (all, item) => item);
+			return removeAnnotation(svg.outerHTML);
 		}
 	},
 	computed: mapState({

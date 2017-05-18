@@ -42,8 +42,8 @@ export default {
         signName: state => state.tool.sign.name,
         pathName: state => state.tool.path.name,
         paletteId: state => state.market.paletteId,
-		moduleTag: state => state.market.moduleTag,
-		lineTag: state => state.market.lineTag
+        moduleTag: state => state.market.moduleTag,
+        lineTag: state => state.market.lineTag
     }),
     methods: {
         ...mapActions([SET_ROOT_METHOD, SET_LINK_METHOD, SET_CODE_KEY]),
@@ -96,7 +96,7 @@ export default {
                     _.extend(end, _.pick(V(endEl).bbox(), 'x', 'y'), { id: endEl.id });
                     _.extend(dataSet[endIndex], { end, el, endEl });
 
-                    this.watchLink(endIndex);
+                    this.watchLink();
                 } else {
                     dataSet.pop();
                 }
@@ -114,8 +114,8 @@ export default {
             return ~~(data.x - data.y + data.height - data.width);
         },
 
-        watchLink: function (index) {
-            const data = this.linkData[index];
+        watchLink: function () {
+            const data = this.linkData.slice(-1)[0];
             const watchPointStart = utils.curryIt(this.triggerWatchLink)(data.el);
             const watchPointEnd = utils.curryIt(this.triggerWatchLink)(data.endEl);
 
@@ -155,6 +155,27 @@ export default {
         hideTool: function (e) {
             const root = utils.findParentByName(e.target, this.rootName);
             utils.setToolDisplay(root, this.boxName, "none");
+        },
+
+        //add Dropped svg's linkData
+        addDropLinkData: function (lineArr, idMap) {
+            const dataArr = JSON.parse(formatSVGHtmlToStr(lineArr));
+            dataArr.forEach((item) => {
+                const lineData = JSON.parse(replaceStrId(item[this.lineTag], idMap));
+                lineData.el = document.getElementById(lineData.start.id);
+                lineData.endEl = document.getElementById(lineData.end.id);
+                this.linkData.push(lineData);
+                this.watchLink();
+            });
+        },
+        addDropModule: function (moduleArr, boxEl, point) {
+            moduleArr.forEach((dom) => {
+                const vel = V(dom);
+                vel.translate(~~point.x, ~~point.y);
+                utils.setToolDisplay(vel.node, this.signName, "none");
+                utils.setToolDisplay(vel.node, this.boxName, "block");
+                boxEl.appendChild(vel.node);
+            });
         }
     },
     created: function () {
@@ -167,24 +188,15 @@ export default {
 
         $(this.$el).droppable({
             accept: 'svg',
-            drop: (function(e, ui) {
+            drop: (function (e, ui) {
                 //endEl, el 没有，所以箭头不能跟踪；还有普通组件和混合组件还没有区别对待
                 const moduleArr = Array.from(ui.helper[0].querySelectorAll(productCombSelector(this.moduleTag)));
                 const lineArr = Array.from(ui.helper[0].querySelectorAll(productCombSelector(this.lineTag)));
                 const idMap = recurMapDomId(moduleArr);
-                const dataArr = JSON.parse(formatSVGHtmlToStr(lineArr));
-                dataArr.forEach((item) => {
-                    this.linkData.push(JSON.parse(replaceStrId(item[this.lineTag], idMap)));
-                });
+                const point = lineArr.length === 0 ? V(this.svg).toLocalPoint(ui.position.left, ui.position.top) : {};
 
-                // const point = V(this.svg).toLocalPoint(ui.position.left, ui.position.top);
-                moduleArr.forEach( (dom) => {
-                    const vel = V(dom);
-                    // vel.translate(~~point.x, ~~point.y);
-                    utils.setToolDisplay(vel.node, this.signName, "none");
-                    utils.setToolDisplay(vel.node, this.boxName, "block");
-                    this.gStates.appendChild(vel.node);
-                })
+                this.addDropModule(moduleArr, this.gStates, point);
+                this.addDropLinkData(lineArr, idMap);
             }).bind(this)
         });
 

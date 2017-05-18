@@ -65,6 +65,10 @@ export function productCombSelector(confArr) {
     return selector;
 }
 
+export function removeAnnotation(data) {
+    return data.replace(/<!--(.*?)-->/, (all, item) => item);
+}
+
 export function formatSVGHtmlToStr(domArr) {
     function parseAttribute(attribute) {
         const data = {};
