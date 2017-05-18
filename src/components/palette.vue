@@ -189,12 +189,12 @@ export default {
         $(this.$el).droppable({
             accept: 'svg',
             drop: (function (e, ui) {
-                const moduleArr = findAllSelector(ui.helper[0], this.moduleTag);
+                const moduleArr = findAllSelector(ui.helper[0], this.moduleTag, true);
                 const lineArr = findAllSelector(ui.helper[0], this.lineTag);
                 const idMap = recurMapDomId(moduleArr);
-                const point = moduleArr.length > 1 ? {} : V(this.svg).toLocalPoint(ui.position.left, ui.position.top);
+                const point = lineArr.length > 0 ? {} : V(this.svg).toLocalPoint(ui.position.left, ui.position.top);
 
-                this.addDropModule(Array.from($(ui.helper[0]).children(['[', this.moduleTag, ']'].join(''))), this.gStates, point);
+                this.addDropModule(moduleArr, this.gStates, point);
                 this.addDropLinkData(lineArr, idMap);
             }).bind(this)
         });

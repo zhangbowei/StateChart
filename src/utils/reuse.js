@@ -55,7 +55,7 @@ export function recurMapDomId(elArr) {
 
     return map;
 }
-export function findAllSelector(el, confArr) {
+export function findAllSelector(el, confArr, isTop) {
     function productCombSelector(confArr) {
         const keyArr = Array.isArray(confArr) ? confArr : [confArr];
         const selector = keyArr.slice().reduce(function (prev, item) {
@@ -64,8 +64,16 @@ export function findAllSelector(el, confArr) {
 
         return selector;
     }
+    function findTopDom(targetArr) {
+        return targetArr.filter(function (element) {
+            return targetArr.reduce(function (isTop, item) {
+                return (item !== element && item.contains(element)) ? false : isTop;
+            }, true);
+        });
+    }
 
-    return Array.from(el.querySelectorAll(productCombSelector(confArr)));
+    const domArr = Array.from(el.querySelectorAll(productCombSelector(confArr)));
+    return isTop ? findTopDom(domArr) : domArr;
 }
 
 export function removeAnnotation(data) {
@@ -107,7 +115,7 @@ export function formatSVGHtmlToStr(palette, conf) {
     const lineTag = conf.lineTag;
     const linkName = conf.linkName;
     const pointTag = conf.pointTag;
-    const moduleArr = findAllSelector(palette, moduleTag);
+    const moduleArr = findAllSelector(palette, moduleTag, true);
     const domArr = findAllSelector(palette, [moduleTag, lineTag]);
 
     storeChildId(moduleArr, linkName, pointTag);
@@ -208,7 +216,7 @@ export function formatSVGStrToHtml(contentStr, conf) {
         };
 
         setComponent(moduleContent, svg);
-        setChildId(findAllSelector(svg, moduleTag), linkName, pointTag);
+        setChildId(findAllSelector(svg, moduleTag, true), linkName, pointTag);
 
         return svg;
     }
@@ -228,7 +236,7 @@ export function formatSVGStrToHtml(contentStr, conf) {
     const productLink = conf.productLink;
     const content = classifyContentStr(contentStr, moduleTag, lineTag);
     const exclKey = ['children', 'parentId', moduleTag];
-    const moduleSvg = integrateComponent(content[moduleTag], list, {moduleTag, pointTag, linkName});
+    const moduleSvg = integrateComponent(content[moduleTag], list, { moduleTag, pointTag, linkName });
     const idMap = recurMapDomId(moduleSvg);
     const res = {};
 
