@@ -64,6 +64,7 @@ export default {
         },
         applyProduct() {
             const data = this.assembleData();
+                //检查条件待完善
             if (JSON.parse(data[this.content]).length > 1) {
                 this.registerModule(data);
                 this.saveModule(data);

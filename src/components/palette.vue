@@ -192,6 +192,7 @@ export default {
                 const moduleArr = findAllSelector(ui.helper[0], this.moduleTag, true);
                 const lineArr = findAllSelector(ui.helper[0], this.lineTag);
                 const idMap = recurMapDomId(moduleArr);
+                //检查条件待完善
                 const point = lineArr.length > 0 ? {} : V(this.svg).toLocalPoint(ui.position.left, ui.position.top);
 
                 this.addDropModule(moduleArr, this.gStates, point);
