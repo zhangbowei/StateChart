@@ -1,9 +1,9 @@
 <script>
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
-import { ADD_CARD_DATASET} from 'store/card';
-import { wrapIdSelector } from "../utils";
-import { makeUniModule, formatSVGHtmlToStr, productCombSelector} from "../utils/reuse";
+import { ADD_CARD_DATASET } from 'store/card';
+import { wrapIdSelector, wrapNameSelector } from "../utils";
+import { makeUniModule, formatSVGHtmlToStr } from "../utils/reuse";
 import Collapse from './collapse';
 
 export default {
@@ -19,10 +19,12 @@ export default {
         paletteId: state => state.market.paletteId,
         moduleTag: state => state.market.moduleTag,
         lineTag: state => state.market.lineTag,
+        pointTag: state => state.market.pointTag,
         name: state => state.card.keyObj.name,
         introduction: state => state.card.keyObj.introduction,
         module: state => state.card.keyObj.module,
-        content: state => state.card.keyObj.content
+        content: state => state.card.keyObj.content,
+        linkName: state => state.tool.link.name
     }),
     methods: {
         ...mapActions([ADD_CARD_DATASET]),
@@ -30,7 +32,7 @@ export default {
         activeChange(value) {
             this.isExpand = value;
         },
-        formData() {
+        getFormData() {
             const domArr = Array.from(this.$el.querySelectorAll('[name]'));
             return domArr.reduce(function (prev, item) {
                 prev[item.name] = item.value.trim();
@@ -38,14 +40,18 @@ export default {
             }, {});
         },
         assembleData() {
-            const data = this.formData();
-            const selector = productCombSelector([this.moduleTag, this.lineTag]);
-            const domArr = document.querySelector(wrapIdSelector(this.paletteId)).querySelectorAll(selector);
+            const formData = this.getFormData();
+            const palette = document.querySelector(wrapIdSelector(this.paletteId));
 
-            data[this.content] = formatSVGHtmlToStr(domArr);
-            data[this.module] = makeUniModule(Date.now());
+            formData[this.content] = formatSVGHtmlToStr(palette, {
+                moduleTag: this.moduleTag,
+                lineTag: this.lineTag,
+                linkName: this.linkName,
+                pointTag: this.pointTag
+            });
+            formData[this.module] = makeUniModule(Date.now());
 
-            return data;
+            return formData;
         },
         registerModule(data) {
             this[ADD_CARD_DATASET](data);
@@ -58,9 +64,10 @@ export default {
         },
         applyProduct() {
             const data = this.assembleData();
-
-            this.registerModule(data);
-            this.saveModule(data);
+            if (JSON.parse(data[this.content]).length > 1) {
+                this.registerModule(data);
+                this.saveModule(data);
+            }
         }
     }
 

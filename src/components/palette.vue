@@ -1,6 +1,6 @@
 <script>
 import utils from "../utils";
-import { recurMapDomId, formatSVGHtmlToStr, productCombSelector, replaceStrId } from "../utils/reuse";
+import { recurMapDomId, productAttribute, findAllSelector, replaceStrId } from "../utils/reuse";
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
 import { SET_ROOT_METHOD, SET_LINK_METHOD } from 'store/tool';
@@ -159,7 +159,7 @@ export default {
 
         //add Dropped svg's linkData
         addDropLinkData: function (lineArr, idMap) {
-            const dataArr = JSON.parse(formatSVGHtmlToStr(lineArr));
+            const dataArr = productAttribute(lineArr);
             dataArr.forEach((item) => {
                 const lineData = JSON.parse(replaceStrId(item[this.lineTag], idMap));
                 lineData.el = document.getElementById(lineData.start.id);
@@ -189,13 +189,12 @@ export default {
         $(this.$el).droppable({
             accept: 'svg',
             drop: (function (e, ui) {
-                //endEl, el 没有，所以箭头不能跟踪；还有普通组件和混合组件还没有区别对待
-                const moduleArr = Array.from(ui.helper[0].querySelectorAll(productCombSelector(this.moduleTag)));
-                const lineArr = Array.from(ui.helper[0].querySelectorAll(productCombSelector(this.lineTag)));
+                const moduleArr = findAllSelector(ui.helper[0], this.moduleTag);
+                const lineArr = findAllSelector(ui.helper[0], this.lineTag);
                 const idMap = recurMapDomId(moduleArr);
-                const point = lineArr.length === 0 ? V(this.svg).toLocalPoint(ui.position.left, ui.position.top) : {};
+                const point = moduleArr.length > 1 ? {} : V(this.svg).toLocalPoint(ui.position.left, ui.position.top);
 
-                this.addDropModule(moduleArr, this.gStates, point);
+                this.addDropModule(Array.from($(ui.helper[0]).children(['[', this.moduleTag, ']'].join(''))), this.gStates, point);
                 this.addDropLinkData(lineArr, idMap);
             }).bind(this)
         });

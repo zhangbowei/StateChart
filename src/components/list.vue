@@ -48,6 +48,8 @@ export default {
 			const svg = formatSVGStrToHtml(contentStr, {
 				moduleTag: this.moduleTag,
 				lineTag: this.lineTag,
+				pointTag: this.pointTag,
+				linkName: this.linkName,
 				list: this.$el,
 				productLink
 			});
@@ -64,11 +66,13 @@ export default {
 		datasets: state => state.card.datasets.filter(data => data.name.includes(state.card.filterKey)),
 		convertModuleToComp: state => state.card.convertModuleToComp,
 		rootName: state => state.tool.root.name,
+		linkName: state => state.tool.link.name,
 		paletteId: state => state.market.paletteId,
 		listId: state => state.market.listId,
 		storageKey: state => state.market.storageKey,
 		moduleTag: state => state.market.moduleTag,
 		lineTag: state => state.market.lineTag,
+		pointTag: state => state.market.pointTag,
 		module: state => state.card.keyObj.module,
 		content: state => state.card.keyObj.content
 	}),

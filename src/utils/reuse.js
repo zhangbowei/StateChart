@@ -55,22 +55,25 @@ export function recurMapDomId(elArr) {
 
     return map;
 }
+export function findAllSelector(el, confArr) {
+    function productCombSelector(confArr) {
+        const keyArr = Array.isArray(confArr) ? confArr : [confArr];
+        const selector = keyArr.slice().reduce(function (prev, item) {
+            return prev.concat([['[', item, ']'].join('')]);
+        }, []).join();
 
-export function productCombSelector(confArr) {
-    const keyArr = Array.isArray(confArr) ? confArr : [confArr];
-    const selector = keyArr.slice().reduce(function (prev, item) {
-        return prev.concat([['[', item, ']'].join('')]);
-    }, []).join();
+        return selector;
+    }
 
-    return selector;
+    return Array.from(el.querySelectorAll(productCombSelector(confArr)));
 }
 
 export function removeAnnotation(data) {
     return data.replace(/<!--(.*?)-->/, (all, item) => item);
 }
 
-export function formatSVGHtmlToStr(domArr) {
-    function parseAttribute(attribute) {
+export function productAttribute(targetArr) {
+    function parseAttr(attribute) {
         const data = {};
         for (let key in attribute) {
             if (attribute.hasOwnProperty(key)) {
@@ -81,22 +84,40 @@ export function formatSVGHtmlToStr(domArr) {
         return data;
     }
 
-    const targetArr = Array.from(domArr);
-    const res = targetArr.reduce(function (prev, item) {
-        const data = parseAttribute(item.attributes);
+    return targetArr.reduce(function (prev, item) {
+        const data = parseAttr(item.attributes);
         const parent = item.parentNode;
 
         data.parentId = (parent.id && targetArr.includes(parent)) ? parent.id : null;
         return prev.concat([data]);
     }, []);
+}
 
+export function formatSVGHtmlToStr(palette, conf) {
+    function storeChildId(parentArr, childName, dataTag) {
+        parentArr.forEach((parent) => {
+            const data = findAllSelector(parent, ['name=', childName].join('')).reduce(function (prev, item) {
+                return prev.concat([item.id]);
+            }, []);
+            parent.setAttribute(dataTag, JSON.stringify(data));
+        });
+    }
 
-    return JSON.stringify(res);
+    const moduleTag = conf.moduleTag;
+    const lineTag = conf.lineTag;
+    const linkName = conf.linkName;
+    const pointTag = conf.pointTag;
+    const moduleArr = findAllSelector(palette, moduleTag);
+    const domArr = findAllSelector(palette, [moduleTag, lineTag]);
+
+    storeChildId(moduleArr, linkName, pointTag);
+
+    return JSON.stringify(productAttribute(domArr));
 }
 
 
 export function formatSVGStrToHtml(contentStr, conf) {
-    function processContent(data, moduleTag, linkTag) {
+    function classifyContentStr(data, moduleTag, linkTag) {
         const deepData = JSON.parse(data).reduce(function (prev, item) {
             prev[item.parentId] ? prev[item.parentId].push(item) : prev[item.parentId] = [item];
             return prev;
@@ -160,26 +181,40 @@ export function formatSVGStrToHtml(contentStr, conf) {
 
         return dom.children[0];
     }
-    function integrateComponent(moduleArr, list, tag) {
-        const baseHTML = parseBaseComponent(list, tag);
+
+    function setChildId(parentArr, childName, dataTag) {
+        parentArr.forEach((parent) => {
+            const pointIdArr = JSON.parse(parent.getAttribute(dataTag));
+            findAllSelector(parent, ['name=', childName].join('')).forEach(function (item, index) {
+                item.id = pointIdArr[index];
+            });
+        });
+    }
+
+    function integrateComponent(moduleContent, list, conf) {
+        const linkName = conf.linkName;
+        const moduleTag = conf.moduleTag;
+        const pointTag = conf.pointTag;
+        const baseHTML = parseBaseComponent(list, moduleTag);
         const svg = document.createElement('svg');
         const setComponent = function (dataArr, parent) {
             if (!Array.isArray(dataArr)) return;
             dataArr.forEach(function (item) {
-                const el = strToDom(baseHTML[item[tag]]);
+                const el = strToDom(baseHTML[item[moduleTag]]);
                 initDOM(el, filterObj(item, exclKey));
                 parent.appendChild(el);
                 setComponent(item.children, el);
             });
         };
 
-        setComponent(moduleArr, svg);
+        setComponent(moduleContent, svg);
+        setChildId(findAllSelector(svg, moduleTag), linkName, pointTag);
 
         return svg;
     }
-    function integrateLink(lineArr, dataToHtml, updateData) {
-        if (!Array.isArray(lineArr)) return;
-        return lineArr.reduce(function (prev, item) {
+    function integrateLink(lineContent, dataToHtml, updateData) {
+        if (!Array.isArray(lineContent)) return;
+        return lineContent.reduce(function (prev, item) {
             return prev + dataToHtml(updateData(item[lineTag]));
         }, '');
     }
@@ -187,11 +222,13 @@ export function formatSVGStrToHtml(contentStr, conf) {
 
     const moduleTag = conf.moduleTag;
     const lineTag = conf.lineTag;
+    const pointTag = conf.pointTag;
+    const linkName = conf.linkName;
     const list = conf.list;
     const productLink = conf.productLink;
-    const content = processContent(contentStr, moduleTag, lineTag);
+    const content = classifyContentStr(contentStr, moduleTag, lineTag);
     const exclKey = ['children', 'parentId', moduleTag];
-    const moduleSvg = integrateComponent(content[moduleTag], list, moduleTag);
+    const moduleSvg = integrateComponent(content[moduleTag], list, {moduleTag, pointTag, linkName});
     const idMap = recurMapDomId(moduleSvg);
     const res = {};
 
@@ -202,3 +239,4 @@ export function formatSVGStrToHtml(contentStr, conf) {
 
     return processStrToSVG(annotation(res, lineTag));
 }
+
