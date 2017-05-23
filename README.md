@@ -17,6 +17,9 @@
 <img src="https://ww1.sinaimg.cn/large/006tNbRwly1fdlcneju9lj314q0ow77a.jpg" width = "400" height = "300" alt="图片名称" align=center />
 <img src="https://ww3.sinaimg.cn/large/006tNbRwly1fdlcn8ft20j318s0oq0we.jpg" width = "500" height = "300" alt="图片名称" align=center />
 
+## 结果复用
+<img src="https://ww3.sinaimg.cn/large/006tNbRwly1ffvkruy54hg30z50hj1fo.gif" width = "500" height = "300" alt="图片名称" align=center />
+
 ## Build Setup
 
 ```bash
